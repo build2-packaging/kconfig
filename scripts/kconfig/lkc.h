@@ -37,6 +37,10 @@ static inline const char *CONFIG_prefix(void)
 #undef CONFIG_
 #define CONFIG_ CONFIG_prefix()
 
+#ifndef KCONFIG_AUTOCONFIG
+#define KCONFIG_AUTOCONFIG "include/config/auto.conf"
+#endif
+
 extern int yylineno;
 void zconfdump(FILE *out);
 void zconf_starthelp(void);
