@@ -229,7 +229,7 @@ static const char *conf_get_autoconfig_name(void)
 {
 	char *name = getenv("KCONFIG_AUTOCONFIG");
 
-	return name ? name : "include/config/auto.conf";
+	return name ? name : KCONFIG_AUTOCONFIG;
 }
 
 static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
@@ -1051,6 +1051,9 @@ int conf_write_autoconf(int overwrite)
 	const char *autoconf_name = conf_get_autoconfig_name();
 	FILE *out, *out_h;
 	int i;
+
+        if (!autoconf_name)
+		return 0;
 
 	if (!overwrite && is_present(autoconf_name))
 		return 0;

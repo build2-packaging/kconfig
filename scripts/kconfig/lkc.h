@@ -41,6 +41,10 @@ static inline const char *CONFIG_prefix(void)
 #undef CONFIG_
 #define CONFIG_ CONFIG_prefix()
 
+#ifndef KCONFIG_AUTOCONFIG
+#define KCONFIG_AUTOCONFIG "include/config/auto.conf"
+#endif
+
 enum conf_def_mode {
 	def_default,
 	def_yes,
