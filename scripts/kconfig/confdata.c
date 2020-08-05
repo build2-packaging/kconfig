@@ -351,6 +351,8 @@ int conf_read_simple(const char *name, int def)
 	char *p, *p2;
 	struct symbol *sym;
 	int i, def_flags;
+	const char *config;
+	size_t config_size;
 
 	if (name) {
 		in = zconf_fopen(name);
@@ -424,26 +426,29 @@ load:
 		}
 	}
 
+	config = CONFIG_;
+	config_size = strlen(config);
+
 	while (compat_getline(&line, &line_asize, in) != -1) {
 		conf_lineno++;
 		sym = NULL;
 		if (line[0] == '#') {
-			if (memcmp(line + 2, CONFIG_, strlen(CONFIG_)))
+			if (memcmp(line + 2, config, config_size))
 				continue;
-			p = strchr(line + 2 + strlen(CONFIG_), ' ');
+			p = strchr(line + 2 + config_size, ' ');
 			if (!p)
 				continue;
 			*p++ = 0;
 			if (strncmp(p, "is not set", 10))
 				continue;
 			if (def == S_DEF_USER) {
-				sym = sym_find(line + 2 + strlen(CONFIG_));
+				sym = sym_find(line + 2 + config_size);
 				if (!sym) {
 					conf_set_changed(true);
 					continue;
 				}
 			} else {
-				sym = sym_lookup(line + 2 + strlen(CONFIG_), 0);
+				sym = sym_lookup(line + 2 + config_size, 0);
 				if (sym->type == S_UNKNOWN)
 					sym->type = S_BOOLEAN;
 			}
@@ -459,8 +464,8 @@ load:
 			default:
 				;
 			}
-		} else if (memcmp(line, CONFIG_, strlen(CONFIG_)) == 0) {
-			p = strchr(line + strlen(CONFIG_), '=');
+		} else if (memcmp(line, config, config_size) == 0) {
+			p = strchr(line + config_size, '=');
 			if (!p)
 				continue;
 			*p++ = 0;
@@ -471,7 +476,7 @@ load:
 					*p2 = 0;
 			}
 
-			sym = sym_find(line + strlen(CONFIG_));
+			sym = sym_find(line + config_size);
 			if (!sym) {
 				if (def == S_DEF_AUTO)
 					/*
@@ -480,7 +485,7 @@ load:
 					 * auto.conf but it is missing now,
 					 * include/config/FOO must be touched.
 					 */
-					conf_touch_dep(line + strlen(CONFIG_));
+					conf_touch_dep(line + config_size);
 				else
 					conf_set_changed(true);
 				continue;
