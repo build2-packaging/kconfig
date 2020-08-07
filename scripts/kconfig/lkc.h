@@ -49,6 +49,7 @@ void zconf_initscan(const char *name);
 void zconf_nextfile(const char *name);
 int zconf_lineno(void);
 const char *zconf_curname(void);
+void zconf_free(void);
 
 /* confdata.c */
 const char *conf_get_configname(void);
@@ -127,6 +128,7 @@ bool menu_has_help(struct menu *menu);
 const char *menu_get_help(struct menu *menu);
 struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head);
 void menu_get_ext_help(struct menu *menu, struct gstr *help);
+void menu_free(struct menu *menu, int free);
 
 /* symbol.c */
 void sym_clear_all_valid(void);

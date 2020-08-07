@@ -156,6 +156,9 @@ struct symbol {
 /* choice values need to be set before calculating this symbol value */
 #define SYMBOL_NEED_SET_CHOICE_VALUES  0x100000
 
+/* Set if symbol.curr.val has to be freed. */
+#define SYMBOL_CURR_FREE 0x200000
+
 #define SYMBOL_MAXLENGTH	256
 #define SYMBOL_HASHSIZE		9973
 

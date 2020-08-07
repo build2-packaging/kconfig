@@ -90,10 +90,10 @@ struct expr *expr_copy(const struct expr *org)
 		break;
 	case E_AND:
 	case E_OR:
-	case E_LIST:
 		e->left.expr = expr_copy(org->left.expr);
 		e->right.expr = expr_copy(org->right.expr);
 		break;
+	case E_LIST:
 	default:
 		fprintf(stderr, "can't copy type %d\n", e->type);
 		free(e);
@@ -111,6 +111,7 @@ void expr_free(struct expr *e)
 
 	switch (e->type) {
 	case E_SYMBOL:
+	case E_RANGE:
 		break;
 	case E_NOT:
 		expr_free(e->left.expr);
@@ -126,6 +127,9 @@ void expr_free(struct expr *e)
 	case E_AND:
 		expr_free(e->left.expr);
 		expr_free(e->right.expr);
+		break;
+	case E_LIST:
+		expr_free(e->left.expr); /* right is sym */
 		break;
 	default:
 		fprintf(stderr, "how to free type %d?\n", e->type);

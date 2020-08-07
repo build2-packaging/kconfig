@@ -1357,3 +1357,39 @@ void conf_rewrite_mod_or_yes(enum conf_def_mode mode)
 	}
 	sym_clear_all_valid();
 }
+
+void conf_free()
+{
+	int i;
+	struct file *nf;
+	struct symbol *ns;
+
+	/* Menus */
+	menu_free(&rootmenu, 0);
+	modules_sym = NULL;
+
+	/* Symbols */
+	for (i = 0; i != SYMBOL_HASHSIZE; ++i) {
+		for (ns = symbol_hash[i]; ns;) {
+			struct symbol *s = ns;
+			ns = ns->next;
+			sym_free(s);
+		}
+	}
+	memset(symbol_hash, 0, sizeof(symbol_hash));
+
+	/* Files */
+	for (nf = file_list; nf;) {
+		struct file *f = nf;
+		nf = nf->next;
+		free((void *)f->name);
+		free(f);
+	}
+	file_list = NULL;
+
+	/* Preprocessor */
+	preprocess_free();
+
+	/* Lexer/Parser */
+	zconf_free();
+}

@@ -12,6 +12,7 @@ void conf_set_changed(bool val);
 bool conf_get_changed(void);
 void conf_set_changed_callback(void (*fn)(void));
 void conf_set_message_callback(void (*fn)(const char *s));
+void conf_free(void);
 
 /* symbol.c */
 extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
@@ -32,8 +33,10 @@ bool sym_set_string_value(struct symbol *sym, const char *newval);
 bool sym_is_changeable(struct symbol *sym);
 struct property * sym_get_choice_prop(struct symbol *sym);
 const char * sym_get_string_value(struct symbol *sym);
+void sym_free(struct symbol *sym);
 
 const char * prop_get_type_name(enum prop_type type);
+void prop_free(struct property *prop);
 
 /* preprocess.c */
 enum variable_flavor {
@@ -47,6 +50,7 @@ void variable_add(const char *name, const char *value,
 void variable_all_del(void);
 char *expand_dollar(const char **str);
 char *expand_one_token(const char **str);
+void preprocess_free(void);
 
 /* expr.c */
 void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken);
