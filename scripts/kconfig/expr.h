@@ -159,6 +159,9 @@ struct symbol {
 /* Set symbol to y if allnoconfig; used for symbols that hide others */
 #define SYMBOL_ALLNOCONFIG_Y 0x200000
 
+/* Set if symbol.curr.val has to be freed. */
+#define SYMBOL_CURR_FREE 0x400000
+
 #define SYMBOL_MAXLENGTH	256
 #define SYMBOL_HASHSIZE		9973
 
