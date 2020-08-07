@@ -152,6 +152,7 @@ static void sym_validate_range(struct symbol *sym)
 	else
 		sprintf(str, "0x%llx", val2);
 	sym->curr.val = xstrdup(str);
+	sym->flags |= SYMBOL_CURR_FREE;
 }
 
 static void sym_set_changed(struct symbol *sym)
@@ -1311,4 +1312,37 @@ const char *prop_get_type_name(enum prop_type type)
 		break;
 	}
 	return "unknown";
+}
+
+void prop_free(struct property *n)
+{
+	while (n) {
+		struct property *p = n;
+		n = n->next;
+		free((void *)p->text);
+		expr_free(p->visible.expr);
+		expr_free(p->expr);
+		free(p);
+	}
+}
+
+void sym_free(struct symbol *s)
+{
+	prop_free(s->prop);
+
+	if (s->type != S_BOOLEAN && s->type != S_TRISTATE) {
+		int i;
+		for (i = 0; i != S_DEF_COUNT; ++i)
+			free(s->def[i].val);
+	}
+
+	if (s->flags & SYMBOL_CURR_FREE)
+		free(s->curr.val);
+
+	expr_free(s->dir_dep.expr);
+	expr_free(s->rev_dep.expr);
+	expr_free(s->implied.expr);
+
+	free(s->name);
+	free(s);
 }

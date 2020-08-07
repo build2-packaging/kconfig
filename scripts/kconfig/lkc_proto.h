@@ -11,6 +11,7 @@ int conf_write_autoconf(int overwrite);
 bool conf_get_changed(void);
 void conf_set_changed_callback(void (*fn)(void));
 void conf_set_message_callback(void (*fn)(const char *s));
+void conf_free(void);
 
 /* menu.c */
 extern struct menu rootmenu;
@@ -25,6 +26,7 @@ bool menu_has_help(struct menu *menu);
 const char * menu_get_help(struct menu *menu);
 struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head);
 void menu_get_ext_help(struct menu *menu, struct gstr *help);
+void menu_free(struct menu *menu, int free);
 
 /* symbol.c */
 extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
@@ -45,8 +47,10 @@ bool sym_set_string_value(struct symbol *sym, const char *newval);
 bool sym_is_changeable(struct symbol *sym);
 struct property * sym_get_choice_prop(struct symbol *sym);
 const char * sym_get_string_value(struct symbol *sym);
+void sym_free(struct symbol *sym);
 
 const char * prop_get_type_name(enum prop_type type);
+void prop_free(struct property *prop);
 
 /* preprocess.c */
 enum variable_flavor {
@@ -60,6 +64,7 @@ void variable_add(const char *name, const char *value,
 void variable_all_del(void);
 char *expand_dollar(const char **str);
 char *expand_one_token(const char **str);
+void preprocess_free(void);
 
 /* expr.c */
 void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken);

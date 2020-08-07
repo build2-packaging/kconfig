@@ -159,9 +159,11 @@ struct property *menu_add_prompt(enum prop_type type, char *prompt,
 	struct property *prop = menu_add_prop(type, NULL, dep);
 
 	if (isspace(*prompt)) {
+		char *p = prompt;
 		prop_warn(prop, "leading whitespace ignored");
-		while (isspace(*prompt))
-			prompt++;
+		while (isspace(*p))
+			p++;
+		memmove(prompt, p, strlen(p) + 1);
 	}
 	if (current_entry->prompt)
 		prop_warn(prop, "prompt redefined");
@@ -501,7 +503,8 @@ void menu_finalize(struct menu *parent)
 			last_menu->next = NULL;
 		}
 
-		sym->dir_dep.expr = expr_alloc_or(sym->dir_dep.expr, parent->dep);
+		sym->dir_dep.expr = expr_alloc_or(sym->dir_dep.expr,
+						  expr_copy(parent->dep));
 	}
 	for (menu = parent->list; menu; menu = menu->next) {
 		if (sym && sym_is_choice(sym) &&
@@ -606,9 +609,10 @@ void menu_finalize(struct menu *parent)
 	 * as a type of symbol.
 	 */
 	if (sym && !sym_is_optional(sym) && parent->prompt) {
-		sym->rev_dep.expr = expr_alloc_or(sym->rev_dep.expr,
-				expr_alloc_and(parent->prompt->visible.expr,
-					expr_alloc_symbol(&symbol_mod)));
+		sym->rev_dep.expr = expr_alloc_or(
+			sym->rev_dep.expr,
+			expr_alloc_and(expr_copy(parent->prompt->visible.expr),
+				       expr_alloc_symbol(&symbol_mod)));
 	}
 }
 
@@ -896,4 +900,36 @@ void menu_get_ext_help(struct menu *menu, struct gstr *help)
 	str_printf(help, "%s\n", help_text);
 	if (sym)
 		get_symbol_str(help, sym, NULL);
+}
+
+void menu_free(struct menu *n0, int f)
+{
+	struct menu *n;
+	for (n = n0; n;) {
+		struct property *p = NULL;
+		struct menu *m = n;
+		n = n->next;
+		menu_free(m->list, 1);
+
+		/* The prompt property is shared with the symbol, if there
+                   is one (see menu_add_prop()). */
+		if (m->sym) {
+			for (p = m->sym->prop; p && p != m->prompt; p = p->next)
+				;
+		}
+		if (!p)
+			prop_free(m->prompt);
+
+		expr_free(m->visibility);
+		expr_free(m->dep);
+		free(m->help);
+
+		if (m != n0)
+			free(m);
+	}
+
+	if (f)
+		free(n0);
+	else
+		memset(n0, 0, sizeof(*n0));
 }
