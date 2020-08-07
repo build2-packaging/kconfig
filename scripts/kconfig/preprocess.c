@@ -60,6 +60,14 @@ static void env_del(struct env *e)
 	free(e);
 }
 
+static void env_all_del(void)
+{
+	struct env *e, *tmp;
+
+	list_for_each_entry_safe (e, tmp, &env_list, node)
+		env_del(e);
+}
+
 /* The returned pointer must be freed when done */
 static char *env_expand(const char *name)
 {
@@ -335,6 +343,12 @@ void variable_all_del(void)
 
 	list_for_each_entry_safe(v, tmp, &variable_list, node)
 		variable_del(v);
+}
+
+void preprocess_free(void)
+{
+	env_all_del();
+	variable_all_del();
 }
 
 /*

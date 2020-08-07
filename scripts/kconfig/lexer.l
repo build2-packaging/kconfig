@@ -40,6 +40,18 @@ struct buffer *current_buf;
 
 static int last_ts, first_ts;
 
+int yylex_destroy(void);
+
+void zconf_free(void)
+{
+	yylex_destroy();
+	memset(&current_pos, 0, sizeof(current_pos));
+	prev_prev_token = T_EOL; prev_token = T_EOL;
+	text = NULL; text_size = 0; text_asize = 0;
+	current_buf = NULL;
+        last_ts = 0; first_ts = 0;
+}
+
 static char *expand_token(const char *in, size_t n);
 static void append_expanded_string(const char *in);
 static void zconf_endhelp(void);
