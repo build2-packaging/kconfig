@@ -1,0 +1,4 @@
+[submodule "upstream"]
+	path = upstream
+	url = ./
+	branch = upstream-5.7.6
