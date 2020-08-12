@@ -1,0 +1,83 @@
+test.arguments += Kconfig
+
+: basics
+:
+cat <<EOI >=Kconfig;
+config FOO
+	bool "Foo support"
+
+config BAR
+	bool "Bar support"
+
+config BAZ
+	bool "Baz support"
+	depends on BAR
+EOI
+cat <<EOI >=config;
+CONFIG_FOO=n
+CONFIG_BAR=y
+CONFIG_BAZ=y
+EOI
+$* config >>EOO
+BAR bool y
+BAZ bool y
+FOO bool n
+EOO
+
+: values
+:
+cat <<EOI >=Kconfig;
+config INT
+	int "Integer value"
+
+config HEX
+	hex "Hex value"
+
+config STR
+	string "String value"
+
+config STR_HELPER
+	string
+	default "foobar"
+EOI
+cat <<EOI >=config;
+CONFIG_INT=-1234
+CONFIG_HEX=0xdeadbeef
+CONFIG_STR="The \"Hello, World\" example"
+EOI
+$* config >>EOO
+HEX hex 0xdeadbeef
+INT int -1234
+STR string The "Hello, World" example
+STR_HELPER string foobar
+EOO
+
+: choice
+:
+cat <<EOI >=Kconfig;
+choice COMPRESSION_CHOICE
+	prompt "Compression tool"
+	optional
+
+config GZIP
+	bool "Use gzip"
+	select HAVE_COMPRESSION
+
+config BZIP2
+	bool "Use bzip2"
+	select HAVE_COMPRESSION
+
+endchoice
+
+config HAVE_COMPRESSION
+	bool
+EOI
+cat <<EOI >=config;
+CONFIG_BZIP2=y
+EOI
+$* config >>EOO
+BZIP2 bool y
+COMPRESSION_CHOICE bool y
+GZIP bool n
+HAVE_COMPRESSION bool y
+EOO

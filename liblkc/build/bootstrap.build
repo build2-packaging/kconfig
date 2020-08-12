@@ -1,0 +1,7 @@
+project = liblkc
+
+using version
+using config
+using test
+using install
+using dist

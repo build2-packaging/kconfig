@@ -1,0 +1,3 @@
+# liblkc
+
+C library

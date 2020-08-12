@@ -1,0 +1,6 @@
+$out_root/
+{
+  include liblkc/
+}
+
+export $out_root/liblkc/$import.target
