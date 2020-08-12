@@ -16,6 +16,12 @@
 extern "C" {
 #endif
 
+#ifdef __cplusplus
+#define LKC_UNUSED(x)
+#else
+#define LKC_UNUSED(x) x
+#endif
+
 #include "lkc_proto.h"
 
 #define SRCTREE "srctree"
@@ -136,7 +142,8 @@ static inline struct symbol *sym_get_choice_value(struct symbol *sym)
 	return (struct symbol *)sym->curr.val;
 }
 
-static inline bool sym_set_choice_value(struct symbol *ch, struct symbol *chval)
+static inline bool sym_set_choice_value(struct symbol *LKC_UNUSED(ch),
+					struct symbol *chval)
 {
 	return sym_set_tristate_value(chval, yes);
 }
