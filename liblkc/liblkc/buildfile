@@ -92,7 +92,7 @@ else
 # /usr/include/ recreating subdirectories.
 #
 h{*}: install = false
-h{lkc}@./ h{lkc_proto}@./ h{expr}@./ h{version}:
+h{lkc}@./ h{lkc_proto}@./ h{expr}@./ h{list}@./ h{version}:
 {
   install         = include/liblkc/
   install.subdirs = true
