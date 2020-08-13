@@ -1,2 +1,4 @@
 : 1
 location: liblkc/
+:
+location: kconfig-conf/

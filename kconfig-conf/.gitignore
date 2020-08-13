@@ -1,0 +1,25 @@
+# Compiler/linker output.
+#
+*.d
+*.t
+*.i
+*.ii
+*.o
+*.obj
+*.so
+*.dll
+*.a
+*.lib
+*.exp
+*.pdb
+*.ilk
+*.exe
+*.exe.dlls/
+*.exe.manifest
+*.pc
+
+kconfig-conf
+
+# Testscript output directory (can be symlink).
+#
+test-kconfig-conf

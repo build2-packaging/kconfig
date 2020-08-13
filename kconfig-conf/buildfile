@@ -1,0 +1,8 @@
+import libs = liblkc%lib{lkc}
+
+./: exe{kconfig-conf} doc{README.md} legal{LICENSE} manifest
+
+exe{kconfig-conf}: {h c}{**} $libs testscript
+
+if ($c.class == 'gcc')
+  c.coptions += -Wno-extra -Wno-error
