@@ -502,7 +502,7 @@ void conf_parse(const char *name)
 
 	_menu_init();
 
-	if (getenv("ZCONF_DEBUG"))
+	if (conf_getenv("ZCONF_DEBUG"))
 		yydebug = 1;
 	yyparse();
 
