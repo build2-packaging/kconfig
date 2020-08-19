@@ -515,8 +515,11 @@ void conf_parse(const char *name)
 		modules_sym = sym_find( "n" );
 
 	if (!menu_has_prompt(&rootmenu)) {
+		char *prompt = conf_getenv("KCONFIG_MAINMENU");
+		if (!prompt)
+			prompt = "Main menu";
 		current_entry = &rootmenu;
-		menu_add_prompt(P_MENU, xstrdup("Main menu"), NULL);
+		menu_add_prompt(P_MENU, xstrdup(prompt), NULL);
 	}
 
 	menu_finalize(&rootmenu);
