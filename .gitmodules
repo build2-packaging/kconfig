@@ -1,4 +1,4 @@
 [submodule "upstream"]
 	path = upstream
 	url = ../kconfig.git
-	branch = upstream-5.7.6
+	branch = upstream-5.9-rc1
