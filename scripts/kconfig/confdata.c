@@ -217,6 +217,27 @@ static void conf_message(const char *fmt, ...)
 	va_end(ap);
 }
 
+static char *getenv_default_callback(const char *name, void *data)
+{
+	return getenv(name);
+}
+
+static char *(*getenv_callback)(const char *name, void *data) =
+	getenv_default_callback;
+
+static void *getenv_callback_data;
+
+void conf_set_getenv_callback(char *(*fn)(const char *name, void *data), void *data)
+{
+	getenv_callback = fn;
+	getenv_callback_data = data;
+}
+
+char *conf_getenv(const char *name)
+{
+	return getenv_callback(name, getenv_callback_data);
+}
+
 const char *conf_get_configname(void)
 {
 	char *name = getenv("KCONFIG_CONFIG");

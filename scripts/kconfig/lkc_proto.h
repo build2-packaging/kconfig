@@ -11,6 +11,8 @@ int conf_write_autoconf(int overwrite);
 bool conf_get_changed(void);
 void conf_set_changed_callback(void (*fn)(void));
 void conf_set_message_callback(void (*fn)(const char *s));
+void conf_set_getenv_callback(char *(*fn)(const char *name, void *data), void *data);
+char *conf_getenv(const char *name);
 void conf_free(void);
 
 /* menu.c */

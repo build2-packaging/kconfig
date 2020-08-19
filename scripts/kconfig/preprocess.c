@@ -82,7 +82,7 @@ static char *env_expand(const char *name)
 			return xstrdup(e->value);
 	}
 
-	value = getenv(name);
+	value = conf_getenv(name);
 	if (!value)
 		return NULL;
 
