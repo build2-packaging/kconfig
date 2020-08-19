@@ -213,16 +213,37 @@ static void conf_message(const char *fmt, ...)
 	va_end(ap);
 }
 
+static char *getenv_default_callback(const char *name, void *data)
+{
+	return getenv(name);
+}
+
+static char *(*getenv_callback)(const char *name, void *data) =
+	getenv_default_callback;
+
+static void *getenv_callback_data;
+
+void conf_set_getenv_callback(char *(*fn)(const char *name, void *data), void *data)
+{
+	getenv_callback = fn;
+	getenv_callback_data = data;
+}
+
+char *conf_getenv(const char *name)
+{
+	return getenv_callback(name, getenv_callback_data);
+}
+
 const char *conf_get_configname(void)
 {
-	char *name = getenv("KCONFIG_CONFIG");
+	char *name = conf_getenv("KCONFIG_CONFIG");
 
 	return name ? name : ".config";
 }
 
 static const char *conf_get_autoconfig_name(void)
 {
-	char *name = getenv("KCONFIG_AUTOCONFIG");
+	char *name = conf_getenv("KCONFIG_AUTOCONFIG");
 
 	return name ? name : KCONFIG_AUTOCONFIG;
 }
@@ -365,7 +386,7 @@ int conf_read_simple(const char *name, int def)
 			goto load;
 		conf_set_changed(true);
 
-		env = getenv("KCONFIG_DEFCONFIG_LIST");
+		env = conf_getenv("KCONFIG_DEFCONFIG_LIST");
 		if (!env)
 			return 1;
 
@@ -868,7 +889,7 @@ int conf_write(const char *name)
 	if (make_parent_dir(name))
 		return -1;
 
-	env = getenv("KCONFIG_OVERWRITECONFIG");
+	env = conf_getenv("KCONFIG_OVERWRITECONFIG");
 	if (env && *env) {
 		*tmpname = 0;
 		out = fopen(name, "w");
@@ -1102,7 +1123,7 @@ int conf_write_autoconf(int overwrite)
 	fclose(out);
 	fclose(out_h);
 
-	name = getenv("KCONFIG_AUTOHEADER");
+	name = conf_getenv("KCONFIG_AUTOHEADER");
 	if (!name)
 		name = "include/generated/autoconf.h";
 	if (make_parent_dir(name))
@@ -1225,7 +1246,7 @@ bool conf_set_all_new_symbols(enum conf_def_mode mode)
 
 	if (mode == def_random) {
 		int n, p[3];
-		char *env = getenv("KCONFIG_PROBABILITY");
+		char *env = conf_getenv("KCONFIG_PROBABILITY");
 
 		n = 0;
 		while (env && *env) {
