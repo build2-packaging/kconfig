@@ -78,7 +78,7 @@ static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
 	assert(len != 0);
 
 	if (fwrite(str, len, count, out) != count)
-		fprintf(stderr, "Error in writing or end of file.\n");
+		fprintf(stderr, "error in writing or end of file\n");
 }
 
 /* menu.c */
