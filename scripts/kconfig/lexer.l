@@ -436,8 +436,8 @@ void zconf_nextfile(const char *name)
 	for (iter = current_file; iter; iter = iter->parent) {
 		if (!strcmp(iter->name, file->name)) {
 			fprintf(stderr,
-				"Recursive inclusion detected.\n"
-				"Inclusion path:\n"
+				"recursive inclusion detected\n"
+				"inclusion path:\n"
 				"  current file : %s\n", file->name);
 			iter = file;
 			do {
