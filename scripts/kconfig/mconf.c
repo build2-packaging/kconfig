@@ -978,7 +978,7 @@ static int handle_exit(void)
 		/* fall through */
 	case -1:
 		if (!silent)
-			printf("\n\n"
+			fprintf(stderr, "\n\n"
 				 "*** End of the configuration.\n"
 				 "*** Execute 'make' to start the build or try 'make help'."
 				 "\n\n");

@@ -191,9 +191,9 @@ static void conf_warning(const char *fmt, ...)
 
 static void conf_default_message_callback(const char *s)
 {
-	printf("#\n# ");
-	printf("%s", s);
-	printf("\n#\n");
+	fprintf(stderr, "#\n# ");
+	fprintf(stderr, "%s", s);
+	fprintf(stderr, "\n#\n");
 }
 
 static void (*conf_message_callback)(const char *s) =

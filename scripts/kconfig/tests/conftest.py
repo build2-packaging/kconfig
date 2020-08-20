@@ -48,7 +48,7 @@ class Conf:
         extra_env: additional environments
         returncode: exit status of the Kconfig executable
         """
-        command = [CONF_PATH, mode, 'Kconfig']
+        command = [CONF_PATH, mode, '-s', 'Kconfig']
 
         # Override 'srctree' environment to make the test as the top directory
         extra_env['srctree'] = self._test_dir
