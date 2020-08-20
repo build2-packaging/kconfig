@@ -1,5 +1,5 @@
-Recursive inclusion detected.
-Inclusion path:
+recursive inclusion detected
+inclusion path:
   current file : Kconfig.inc1
   included from: Kconfig.inc3:2
   included from: Kconfig.inc2:4
