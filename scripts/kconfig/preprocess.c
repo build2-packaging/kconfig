@@ -266,11 +266,11 @@ static char *variable_expand(const char *name, int argc, char *argv[])
 		return NULL;
 
 	if (argc == 0 && v->exp_count)
-		pperror("Recursive variable '%s' references itself (eventually)",
+		pperror("recursive variable '%s' references itself (eventually)",
 			name);
 
 	if (v->exp_count > 1000)
-		pperror("Too deep recursive expansion");
+		pperror("too deep recursive expansion");
 
 	v->exp_count++;
 

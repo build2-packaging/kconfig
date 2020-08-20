@@ -871,7 +871,7 @@ int conf_write(const char *name)
 	}
 
 	if (is_dir(name)) {
-		fprintf(stderr, "%s: Is a directory\n", name);
+		fprintf(stderr, "%s: is a directory\n", name);
 		return -1;
 	}
 
@@ -947,7 +947,7 @@ next:
 
 	if (*tmpname) {
 		if (is_same(name, tmpname)) {
-			conf_message("No change to %s", name);
+			conf_message("no change to %s", name);
 			unlink(tmpname);
 			sym_set_change_count(0);
 			return 0;
