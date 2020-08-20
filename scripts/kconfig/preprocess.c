@@ -189,7 +189,7 @@ static char *do_shell(int argc, char *argv[])
 static char *do_warning_if(int argc, char *argv[])
 {
 	if (!strcmp(argv[0], "y"))
-		fprintf(stderr, "%s:%d: %s\n",
+		fprintf(stderr, "%s:%d: warning: %s\n",
 			current_file->name, yylineno, argv[1]);
 
 	return xstrdup("");

@@ -89,7 +89,7 @@ static void alloc_string(const char *str, int size)
 static void warn_ignored_character(char chr)
 {
 	fprintf(stderr,
-	        "%s:%d:warning: ignoring unsupported character '%c'\n",
+	        "%s:%d: warning: ignoring unsupported character '%c'\n",
 	        current_file->name, yylineno, chr);
 }
 %}
@@ -196,7 +196,7 @@ n	[A-Za-z0-9_-]
 	}
 	\n	{
 		fprintf(stderr,
-			"%s:%d:warning: multi-line strings not supported\n",
+			"%s:%d: warning: multi-line strings not supported\n",
 			zconf_curname(), zconf_lineno());
 		unput('\n');
 		BEGIN(INITIAL);
@@ -260,7 +260,7 @@ n	[A-Za-z0-9_-]
 	BEGIN(INITIAL);
 
 	if (prev_token != T_EOL && prev_token != T_HELPTEXT)
-		fprintf(stderr, "%s:%d:warning: no new line at end of file\n",
+		fprintf(stderr, "%s:%d: warning: no new line at end of file\n",
 			current_file->name, yylineno);
 
 	if (current_file) {

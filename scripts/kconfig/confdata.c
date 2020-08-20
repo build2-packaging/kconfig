@@ -181,7 +181,7 @@ static void conf_warning(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	fprintf(stderr, "%s:%d:warning: ", conf_filename, conf_lineno);
+	fprintf(stderr, "%s:%d: warning: ", conf_filename, conf_lineno);
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr, "\n");
 	va_end(ap);
