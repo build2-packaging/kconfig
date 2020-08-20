@@ -727,7 +727,7 @@ struct expr *expr_transform(struct expr *e)
 			break;
 		}
 		if (e->right.sym == &symbol_mod) {
-			printf("boolean symbol %s tested for 'm'? test forced to 'n'\n", e->left.sym->name);
+			fprintf(stderr, "boolean symbol %s tested for 'm'? test forced to 'n'\n", e->left.sym->name);
 			e->type = E_SYMBOL;
 			e->left.sym = &symbol_no;
 			e->right.sym = NULL;
@@ -748,7 +748,7 @@ struct expr *expr_transform(struct expr *e)
 			break;
 		}
 		if (e->right.sym == &symbol_mod) {
-			printf("boolean symbol %s tested for 'm'? test forced to 'y'\n", e->left.sym->name);
+			fprintf(stderr, "boolean symbol %s tested for 'm'? test forced to 'y'\n", e->left.sym->name);
 			e->type = E_SYMBOL;
 			e->left.sym = &symbol_yes;
 			e->right.sym = NULL;
@@ -1065,7 +1065,7 @@ tristate expr_calc_value(struct expr *e)
 	case E_UNEQUAL:
 		break;
 	default:
-		printf("expr_calc_value: %d?\n", e->type);
+		fprintf(stderr, "expr_calc_value: %d?\n", e->type);
 		return no;
 	}
 
@@ -1100,7 +1100,7 @@ tristate expr_calc_value(struct expr *e)
 	case E_UNEQUAL:
 		return res ? yes : no;
 	default:
-		printf("expr_calc_value: relation %d?\n", e->type);
+		fprintf(stderr, "expr_calc_value: relation %d?\n", e->type);
 		return no;
 	}
 }
@@ -1135,7 +1135,7 @@ static int expr_compare_type(enum expr_type t1, enum expr_type t2)
 	default:
 		return -1;
 	}
-	printf("[%dgt%d?]", t1, t2);
+	fprintf(stderr, "[%dgt%d?]", t1, t2);
 	return 0;
 }
 

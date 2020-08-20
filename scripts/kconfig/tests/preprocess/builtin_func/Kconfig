@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# 'info' prints the argument to stdout.
+# 'info' prints the argument to stderr.
 $(info,hello world 0)
 
 # 'warning-if', if the first argument is y, sends the second argument to stderr,

@@ -132,7 +132,7 @@ static char *do_filename(int argc, char *argv[])
 
 static char *do_info(int argc, char *argv[])
 {
-	printf("%s\n", argv[0]);
+	fprintf(stderr, "%s\n", argv[0]);
 
 	return xstrdup("");
 }
