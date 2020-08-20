@@ -1504,7 +1504,7 @@ int main(int ac, char **av)
 	getmaxyx(stdscr, lines, columns);
 	if (columns < 75 || lines < 20) {
 		endwin();
-		printf("Your terminal should have at "
+		fprintf(stderr, "Your terminal should have at "
 			"least 20 lines and 75 columns\n");
 		return 1;
 	}
