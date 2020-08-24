@@ -74,7 +74,7 @@ int main (int argc, const char* argv[])
       symbols[j++] = s;
     }
 
-    qsort (symbols, n, sizeof(*symbols), compare_symbols);
+    qsort ((void*)symbols, n, sizeof(*symbols), compare_symbols);
   }
 
   size_t i;
@@ -131,7 +131,7 @@ int main (int argc, const char* argv[])
     fprintf (stdout, "%s %s %s\n", s->name, t, v);
   }
 
-  free (symbols);
+  free ((void*)symbols);
   conf_free ();
   return 0;
 }

@@ -2,7 +2,13 @@ import libs = liblkc%lib{lkc}
 
 ./: exe{kconfig-conf} doc{README.md} legal{LICENSE} manifest
 
-exe{kconfig-conf}: {h c}{**} $libs testscript
+getopt = ($c.target.class == 'windows' && $c.target.system != 'mingw32')
+
+exe{kconfig-conf}: {h c}{*} $libs testscript
+exe{kconfig-conf}: getopt/{h c}{getopt}: include = $getopt
+
+if $getopt
+  c.poptions =+ "-I($src_base/getopt)"
 
 if ($c.class == 'gcc')
   c.coptions += -Wno-extra -Wno-error

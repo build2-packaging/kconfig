@@ -7,9 +7,13 @@ y{*}: extension = y
 define l: file
 l{*}: extension = l
 
-lib{lkc}: {h c}{** -menu -parser.tab... -lexer.lex... -version} \
+windows = ($c.target.class == 'windows')
+
+lib{lkc}: {h c}{* -menu -parser.tab... -lexer.lex... -version} \
           {h c}{parser.tab...} c{lexer.lex...} h{version}
-lib{lkc}: c{menu}: include = adhoc # Included by parser.y.
+lib{lkc}: c{menu}:            include = adhoc # Included by parser.y.
+lib{lkc}: regex/{h c}{regex}: include = $windows
+libs{lkc}: def{lkc}:          include = $windows
 
 if ($flex != [null] && $bison != [null])
 {
@@ -46,6 +50,36 @@ if ($flex != [null] && $bison != [null])
   }
 }
 
+def{lkc}: h{lkc lkc_proto}
+{{
+  diag gen $>
+  d = $path($>)
+  h = $path($<)
+  echo '; Auto-generated, do not edit.' >$d
+  echo 'EXPORTS'                       >>$d
+
+  # Functions:
+  #
+  # 1. Get rid of inline function prototypes.
+  # 2. Extract names from function prototypes.
+  # 3. Filter out x-names (xmalloc(), etc), _*-names and add leading speces.
+  #
+  #
+  cat $h                                                    | \
+    sed    -e 's/.+ inline .+//'                            | \
+    sed -n -e 's/^[a-z][^(]+ \*?([a-z0-9_]+)\(.*[;,]$/\1/p' | \
+    sed -n -e 's/^([^x_].+)$/  \1/p'                        >>$d
+
+  # Variables:
+  #
+  # 1. Extract names from extern variable declarations (can be an array).
+  # 2. Add leading spaces and trailing DATA.
+  #
+  cat $h                                                     | \
+    sed -n -e 's/^extern .+ \*?([a-z0-9_]+)(\[.+\])?;$/\1/p' | \
+    sed -n -e 's/^(.+)$/  \1 DATA/p'                         >>$d
+}}
+
 # Include the generated version header into the distribution (so that we don't
 # pick up an installed one) and don't remove it when cleaning in src (so that
 # clean results in a state identical to distributed).
@@ -60,6 +94,9 @@ h{version}: in{version} $src_root/manifest
 #
 c.poptions =+ "-I$out_root" "-I$src_root" "-I$out_base" "-I$src_base"
 
+if $windows
+  c.poptions =+ "-I($src_base/regex)"
+
 # Make autoconfig support disabled by default.
 #
 c.poptions += -DKCONFIG_AUTOCONFIG=NULL
@@ -67,8 +104,10 @@ c.poptions += -DKCONFIG_AUTOCONFIG=NULL
 obja{*}: c.poptions += -DLIBLKC_STATIC_BUILD
 objs{*}: c.poptions += -DLIBLKC_SHARED_BUILD
 
+regex/obj{regex}: c.poptions += -DSTDC_HEADERS -DREGEX_MALLOC
+
 if ($c.class == 'gcc')
-  c.coptions += -Wno-extra -Wno-error -Wmissing-prototypes -Wstrict-prototypes
+  c.coptions += -Wno-extra -Wno-error
 
 # Export options.
 #
@@ -92,7 +131,7 @@ else
 # /usr/include/ recreating subdirectories.
 #
 h{*}: install = false
-h{lkc}@./ h{lkc_proto}@./ h{expr}@./ h{list}@./ h{version}:
+h{lkc}@./ h{lkc_proto}@./ h{expr}@./ h{list}@./ h{export}@./ h{version}:
 {
   install         = include/liblkc/
   install.subdirs = true

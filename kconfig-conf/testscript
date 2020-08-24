@@ -1,8 +1,6 @@
 test.arguments += -s
 
-: alldefconfig
-:
-cat <<EOI >=Kconfig;
++cat <<EOI >=Kconfig
 config FOO
 	bool "Foo support"
 	default y
@@ -15,7 +13,10 @@ config BAZ
 	bool "Baz support"
 	depends on BAR
 EOI
-$* --alldefconfig Kconfig &.config;
+
+: alldefconfig
+:
+$* --alldefconfig ../Kconfig &.config;
 cat .config >>EOO
 #
 # Automatically generated file; DO NOT EDIT.
@@ -24,3 +25,26 @@ cat .config >>EOO
 CONFIG_FOO=y
 # CONFIG_BAR is not set
 EOO
+
+: olddefconfig
+:
+$* --alldefconfig ../Kconfig &.config;
+sed -ni -e 's/(#.*)/\1/p' .config;
+$* --olddefconfig ../Kconfig &.config.old;
+test -f .config.old;
+sed -ni -e 's/([^#].*)/\1/p' .config; # Test overwrite of .config.old.
+$* --olddefconfig ../Kconfig;
+test -f .config.old
+
+: oldconfig-unchanged
+:
+$* --alldefconfig ../Kconfig &.config;
+$* --oldconfig ../Kconfig;
+test -f .config.old != 0
+
+: randconfig
+:
+$* --randconfig ../Kconfig &.config 2>~'/KCONFIG_SEED=.+/';
+test -f .config;
+$* --oldconfig ../Kconfig;
+test -f .config.old != 0
