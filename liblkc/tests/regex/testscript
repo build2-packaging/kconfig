@@ -1,0 +1,20 @@
+test.arguments += Kconfig
+
+: basics
+:
+cat <<EOI >=Kconfig;
+config FOO
+	bool "Foo support"
+
+config BAR
+	bool "Bar support"
+
+config BAZ
+	bool "Baz support"
+	depends on BAR
+EOI
+$* '[FB].+' >>EOO
+BAR
+BAZ
+FOO
+EOO
