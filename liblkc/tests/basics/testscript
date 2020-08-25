@@ -81,3 +81,35 @@ COMPRESSION_CHOICE bool y
 GZIP bool n
 HAVE_COMPRESSION bool y
 EOO
+
+: source
+:
+cat <<EOI >=Kconfig;
+config FOO
+	bool "Foo support"
+
+source "$(SRC_ROOT)/bar/Kconfig"
+EOI
+mkdir bar;
+cat <<EOI >=bar/Kconfig;
+config BAR
+	bool "Bar support"
+
+source "$(SRC_ROOT)/bar/baz/Kconfig"
+EOI
+mkdir bar/baz;
+cat <<EOI >=bar/baz/Kconfig;
+config BAZ
+	bool "Baz support"
+	depends on BAR
+EOI
+cat <<EOI >=config;
+CONFIG_FOO=n
+CONFIG_BAR=y
+CONFIG_BAZ=y
+EOI
+env "SRC_ROOT=$~" -- $* config >>EOO
+BAR bool y
+BAZ bool y
+FOO bool n
+EOO
