@@ -1036,7 +1036,7 @@ tristate expr_calc_value(struct expr *e)
 	tristate val1, val2;
 	const char *str1, *str2;
 	enum string_value_kind k1 = k_string, k2 = k_string;
-	union string_value lval = {}, rval = {};
+	union string_value lval = { 0 }, rval = { 0 };
 	int res;
 
 	if (!e)
