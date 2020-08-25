@@ -6,8 +6,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h> // off_t
+
 #include <regex.h>
-#include <sys/utsname.h>
 
 #include "lkc.h"
 
