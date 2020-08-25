@@ -7,7 +7,10 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if !defined(KCONFIG_REGEX) || KCONFIG_REGEX
 #include <regex.h>
+#endif
 
 #include "lkc.h"
 
@@ -919,6 +922,7 @@ struct sym_match {
 	off_t		so, eo;
 };
 
+#if !defined(KCONFIG_REGEX) || KCONFIG_REGEX
 /* Compare matched symbols as thus:
  * - first, symbols that match exactly
  * - then, alphabetical sort
@@ -1001,6 +1005,7 @@ sym_re_search_free:
 
 	return sym_arr;
 }
+#endif /* KCONFIG_REGEX */
 
 /*
  * When we check for recursive dependencies we use a stack to save
