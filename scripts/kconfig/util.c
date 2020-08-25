@@ -121,7 +121,17 @@ char *xstrndup(const char *s, size_t n)
 {
 	char *p;
 
+#ifndef _WIN32
 	p = strndup(s, n);
+#else
+	if ((p = malloc(n + 1)))
+	{
+		size_t i;
+		for (i = 0; i != n && s[i] != '\0' ; i++)
+			p[i] = s[i];
+		p[i] = '\0';
+	}
+#endif
 	if (p)
 		return p;
 	fprintf(stderr, "out of memory\n");

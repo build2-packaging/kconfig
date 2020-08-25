@@ -15,8 +15,87 @@
 #include <string.h>
 #include <time.h>
 
+#ifndef _WIN32
 #include <unistd.h>
 #include <sys/mman.h>
+#else
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <process.h> // _getpid()
+#include <direct.h>  // _mkdir()
+#include <io.h>
+
+#ifndef PATH_MAX
+#define PATH_MAX _MAX_PATH /* <stdlib.h> */
+#endif
+
+#ifdef _WIN64
+typedef __int64 ssize_t;
+#else
+typedef long int ssize_t;
+#endif
+
+#define stat _stat
+#define fstat _fstat
+#define mkdir(f, p) _mkdir(f)
+#define getpid _getpid
+
+#ifdef _MSC_VER
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+static void unlink_impl(const char *path)
+{
+  // Deal with Windows sharing violations by retrying.
+  //
+  int r, i;
+  for (i = 0; i < 11; i++)
+  {
+    if (i != 0)
+      Sleep(100);
+
+    r = _unlink(path);
+
+    if (r == 0 || errno != EACCES)
+      break;
+  }
+
+  if (r == -1 && errno != ENOENT)
+  {
+    char s[PATH_MAX + 64];
+    snprintf(s, sizeof(s), "unable to remove %s", path);
+    perror(s);
+    exit(1);
+  }
+}
+
+static int rename_impl(const char *oldpath, const char *newpath)
+{
+  unlink_impl(newpath);
+
+  int r = rename(oldpath, newpath);
+#if 0
+  if (r == -1)
+  {
+    char s[PATH_MAX + PATH_MAX + 64];
+    snprintf(s, sizeof(s), "unable to rename %s to %s", oldpath, newpath);
+    perror(s);
+  }
+#endif
+  return r;
+}
+
+#define unlink unlink_impl
+#define rename rename_impl
+
+#endif
+
+#ifndef __GNUC__
+#define __attribute__(x)
+#endif
 
 #include "lkc.h"
 
@@ -39,12 +118,25 @@ static bool is_dir(const char *path)
 	return S_ISDIR(st.st_mode);
 }
 
+/* return the position of the first component if 'path' is absolute, 0
+   otherwise (so can be used as bool) */
+static inline int is_absolute(const char *path)
+{
+#ifndef _WIN32
+        return *path == '/' ? 1 : 0;
+#else
+	return path[0] != '\0' && path[1] == ':'
+          ? (path[2] == '/' ? 3 : 2)
+          : 0;
+#endif
+}
+
 /* return true if the given two files are the same, false otherwise */
 static bool is_same(const char *file1, const char *file2)
 {
 	int fd1, fd2;
 	struct stat st1, st2;
-	void *map1, *map2;
+	void *map1 = NULL, *map2 = NULL;
 	bool ret = false;
 
 	fd1 = open(file1, O_RDONLY);
@@ -65,6 +157,7 @@ static bool is_same(const char *file1, const char *file2)
 	if (st1.st_size != st2.st_size)
 		goto close2;
 
+#ifndef _WIN32
 	map1 = mmap(NULL, st1.st_size, PROT_READ, MAP_PRIVATE, fd1, 0);
 	if (map1 == MAP_FAILED)
 		goto close2;
@@ -73,10 +166,49 @@ static bool is_same(const char *file1, const char *file2)
 	if (map2 == MAP_FAILED)
 		goto close2;
 
-	if (bcmp(map1, map2, st1.st_size))
+        if (memcmp(map1, map2, st1.st_size))
 		goto close2;
 
-	ret = true;
+        ret = true;
+#else
+        HANDLE map1_h = CreateFileMappingA(
+          (HANDLE)_get_osfhandle (fd1), NULL, PAGE_READONLY, 0, st1.st_size, NULL);
+
+        if (map1_h == NULL)
+          goto close2;
+
+        HANDLE map2_h = CreateFileMappingA(
+          (HANDLE)_get_osfhandle (fd2), NULL, PAGE_READONLY, 0, st1.st_size, NULL);
+
+        if (map2_h == NULL)
+          goto close1_h;
+
+        map1 = MapViewOfFile(map1_h, FILE_MAP_READ, 0, 0, st1.st_size);
+
+        if (!map1)
+          goto close2_h;
+
+        map2 = MapViewOfFile(map2_h, FILE_MAP_READ, 0, 0, st1.st_size);
+
+        if (!map2)
+          goto close2_h;
+
+        if (memcmp(map1, map2, st1.st_size))
+		goto close2_h;
+
+        ret = true;
+
+close2_h:
+        if (map2)
+          UnmapViewOfFile(map2);
+        CloseHandle(map2_h);
+
+close1_h:
+        if (map1)
+          UnmapViewOfFile(map1);
+        CloseHandle(map1_h);
+#endif
+
 close2:
 	close(fd2);
 close1:
@@ -94,6 +226,7 @@ static int make_parent_dir(const char *path)
 {
 	char tmp[PATH_MAX + 1];
 	char *p;
+        int n;
 
 	strncpy(tmp, path, sizeof(tmp));
 	tmp[sizeof(tmp) - 1] = 0;
@@ -106,8 +239,8 @@ static int make_parent_dir(const char *path)
 
 	/* Just in case it is an absolute path */
 	p = tmp;
-	while (*p == '/')
-		p++;
+        while ((n = is_absolute(p)))
+		p += n;
 
 	while ((p = strchr(p, '/'))) {
 		*p = 0;

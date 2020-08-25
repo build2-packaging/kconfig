@@ -12,6 +12,15 @@
 #include "list.h"
 #include "lkc.h"
 
+#ifndef __GNUC__
+#define __attribute__(x)
+#endif
+
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#endif
+
 #define ARRAY_SIZE(arr)		(sizeof(arr) / sizeof((arr)[0]))
 
 static char *expand_string_with_args(const char *in, int argc, char *argv[]);
@@ -40,6 +49,10 @@ struct env {
 	char *value;
 	struct list_head node;
 };
+
+#ifndef __GNUC__
+#define typeof(x) struct env
+#endif
 
 static void env_add(const char *name, const char *value)
 {
@@ -106,6 +119,10 @@ void env_write_dep(FILE *f, const char *autoconfig_name)
 		env_del(e);
 	}
 }
+
+#ifndef __GNUC__
+#undef typeof
+#endif
 
 /*
  * Built-in functions
@@ -244,6 +261,10 @@ struct variable {
 	struct list_head node;
 };
 
+#ifndef __GNUC__
+#define typeof(x) struct variable
+#endif
+
 static struct variable *variable_lookup(const char *name)
 {
 	struct variable *v;
@@ -344,6 +365,10 @@ void variable_all_del(void)
 	list_for_each_entry_safe(v, tmp, &variable_list, node)
 		variable_del(v);
 }
+
+#ifndef __GNUC__
+#undef typeof
+#endif
 
 void preprocess_free(void)
 {
