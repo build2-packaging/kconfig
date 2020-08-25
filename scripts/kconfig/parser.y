@@ -14,7 +14,16 @@
 #include "lkc.h"
 #include "internal.h"
 
-#define printd(mask, fmt...) if (cdebug & (mask)) printf(fmt)
+static inline void printd(int mask, const char *format, ...)
+{
+	va_list ap;
+	if (cdebug & mask)
+	{
+		va_start(ap, format);
+		vprintf(format, ap);
+		va_end(ap);
+	}
+}
 
 #define PRINTD		0x0001
 #define DEBUG_PARSE	0x0002
@@ -392,13 +401,13 @@ help: help_start T_HELPTEXT
 	if (current_entry->help) {
 		free(current_entry->help);
 		zconfprint("warning: '%s' defined with more than one help text -- only the last one will be used",
-			   current_entry->sym->name ?: "<choice>");
+			   current_entry->sym->name ? current_entry->sym->name : "<choice>");
 	}
 
 	/* Is the help text empty or all whitespace? */
 	if ($2[strspn($2, " \f\n\r\t\v")] == '\0')
 		zconfprint("warning: '%s' defined with blank help text",
-			   current_entry->sym->name ?: "<choice>");
+			   current_entry->sym->name ? current_entry->sym->name : "<choice>");
 
 	current_entry->help = $2;
 };
