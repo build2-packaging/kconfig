@@ -6,8 +6,11 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include <regex.h>
 #include <sys/utsname.h>
+
+#if !defined(KCONFIG_REGEX) || KCONFIG_REGEX
+#include <regex.h>
+#endif
 
 #include "lkc.h"
 
@@ -951,6 +954,7 @@ static int sym_rel_comp(const void *sym1, const void *sym2)
 	return strcmp(s1->sym->name, s2->sym->name);
 }
 
+#if !defined(KCONFIG_REGEX) || KCONFIG_REGEX
 struct symbol **sym_re_search(const char *pattern)
 {
 	struct symbol *sym, **sym_arr = NULL;
@@ -1003,6 +1007,7 @@ sym_re_search_free:
 
 	return sym_arr;
 }
+#endif /* KCONFIG_REGEX */
 
 /*
  * When we check for recursive dependencies we use a stack to save
