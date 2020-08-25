@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/utsname.h>
+#include <sys/types.h> // off_t
 
 #if !defined(KCONFIG_REGEX) || KCONFIG_REGEX
 #include <regex.h>
