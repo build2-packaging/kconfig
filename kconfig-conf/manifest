@@ -2,7 +2,7 @@
 name: kconfig-conf
 version: 0.1.0-a.0.z
 project: kconfig
-summary: Linux kernel configuration system, base configurator
+summary: Linux kernel configuration system basic configurator
 license: GPL-2.0-only
 description-file: README.md
 url: https://github.com/build2-packaging/kconfig/
