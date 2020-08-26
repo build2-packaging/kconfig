@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
  */
 %option nostdinit noyywrap never-interactive full ecs
-%option 8bit nodefault yylineno
+%option 8bit yylineno
 %x ASSIGN_VAL HELP STRING
 %{
 
@@ -114,10 +114,10 @@ n	[A-Za-z0-9_-]
 	int str = 0;
 	int ts, i;
 
-#.*			/* ignore comment */
+#[^\r\n]*		/* ignore comment */
 [ \t]*			/* whitespaces */
-\\\n			/* escaped new line */
-\n			return T_EOL;
+\\\r?\n			/* escaped new line */
+\r?\n			return T_EOL;
 "bool"			return T_BOOL;
 "choice"		return T_CHOICE;
 "comment"		return T_COMMENT;
@@ -177,24 +177,25 @@ n	[A-Za-z0-9_-]
 					return T_WORD;
 				free(yylval.string);
 			}
-.			warn_ignored_character(*yytext);
+[^\r\n]			warn_ignored_character(*yytext);
+\r			warn_ignored_character(*yytext);
 
 <ASSIGN_VAL>{
-	[^[:blank:]\n]+.*	{
+	[^[:blank:]\r\n]+[^\r\n]*	{
 		alloc_string(yytext, yyleng);
 		yylval.string = text;
 		return T_ASSIGN_VAL;
 	}
-	\n	{ BEGIN(INITIAL); return T_EOL; }
-	.
+	\r?\n	{ BEGIN(INITIAL); return T_EOL; }
+	[^\r\n]
 }
 
 <STRING>{
-	"$".*	append_expanded_string(yytext);
-	[^$'"\\\n]+	{
+	"$"[^\r\n]*	append_expanded_string(yytext);
+	[^$'"\\\r\n]+	{
 		append_string(yytext, yyleng);
 	}
-	\\.?	{
+	\\[^\r\n]?	{
 		append_string(yytext + 1, yyleng - 1);
 	}
 	\'|\"	{
@@ -205,7 +206,7 @@ n	[A-Za-z0-9_-]
 		} else
 			append_string(yytext, 1);
 	}
-	\n	{
+	\r?\n	{
 		fprintf(stderr,
 			"%s:%d: warning: multi-line strings not supported\n",
 			zconf_curname(), zconf_lineno());
@@ -244,14 +245,14 @@ n	[A-Za-z0-9_-]
 			append_string("        ", ts);
 		}
 	}
-	[ \t]*\n/[^ \t\n] {
+	[ \t]*\r?\n/[^ \t\r\n] {
 		zconf_endhelp();
 		return T_HELPTEXT;
 	}
-	[ \t]*\n	{
+	[ \t]*\r?\n	{
 		append_string("\n", 1);
 	}
-	[^ \t\n].* {
+	[^ \t\r\n][^\r\n]* {
 		while (yyleng) {
 			if ((yytext[yyleng-1] != ' ') && (yytext[yyleng-1] != '\t'))
 				break;
