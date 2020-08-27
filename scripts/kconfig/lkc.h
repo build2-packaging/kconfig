@@ -22,6 +22,16 @@ extern "C" {
 #define LKC_UNUSED(x) x
 #endif
 
+struct gstr {
+	size_t len;
+	char  *s;
+	/*
+	* when max_width is not zero long lines in string s (if any) get
+	* wrapped not to exceed the max_width value
+	*/
+	int max_width;
+};
+
 #include "lkc_proto.h"
 
 #define SRCTREE "srctree"
@@ -110,15 +120,6 @@ char *xstrndup(const char *s, size_t n);
 /* lexer.l */
 int yylex(void);
 
-struct gstr {
-	size_t len;
-	char  *s;
-	/*
-	* when max_width is not zero long lines in string s (if any) get
-	* wrapped not to exceed the max_width value
-	*/
-	int max_width;
-};
 struct gstr str_new(void);
 void str_free(struct gstr *gs);
 void str_append(struct gstr *gs, const char *s);
