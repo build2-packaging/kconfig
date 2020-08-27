@@ -924,6 +924,7 @@ struct sym_match {
 	off_t		so, eo;
 };
 
+#if !defined(KCONFIG_REGEX) || KCONFIG_REGEX
 /* Compare matched symbols as thus:
  * - first, symbols that match exactly
  * - then, alphabetical sort
@@ -954,7 +955,6 @@ static int sym_rel_comp(const void *sym1, const void *sym2)
 	return strcmp(s1->sym->name, s2->sym->name);
 }
 
-#if !defined(KCONFIG_REGEX) || KCONFIG_REGEX
 struct symbol **sym_re_search(const char *pattern)
 {
 	struct symbol *sym, **sym_arr = NULL;
