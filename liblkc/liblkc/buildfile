@@ -111,7 +111,12 @@ regex/obj{regex}: c.poptions += -DSTDC_HEADERS -DREGEX_MALLOC
 switch $c.class
 {
   case 'gcc'
+  {
     c.coptions += -Wno-extra -Wno-error
+
+    if $windows
+      c.coptions += -Wno-deprecated-declarations
+  }
 
   case 'msvc'
     c.coptions += /w
