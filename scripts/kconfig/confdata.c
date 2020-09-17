@@ -544,11 +544,13 @@ int conf_read(const char *name)
 	int conf_unsaved = 0;
 	int i;
 
-	sym_set_change_count(0);
+	if (!name || *name != '\0') {
+		sym_set_change_count(0);
 
-	if (conf_read_simple(name, S_DEF_USER)) {
-		sym_calc_value(modules_sym);
-		return 1;
+		if (conf_read_simple(name, S_DEF_USER)) {
+			sym_calc_value(modules_sym);
+			return 1;
+		}
 	}
 
 	sym_calc_value(modules_sym);
