@@ -411,7 +411,7 @@ FILE *zconf_fopen(const char *name)
 
 	f = fopen(name, "r");
 	if (!f && name != NULL && !is_absolute(name)) {
-		env = getenv(SRCTREE);
+		env = conf_getenv(SRCTREE);
 		if (env) {
 			snprintf(fullname, sizeof(fullname),
 				 "%s/%s", env, name);

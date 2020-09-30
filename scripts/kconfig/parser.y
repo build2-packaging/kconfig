@@ -502,7 +502,7 @@ void conf_parse(const char *name)
 
 	_menu_init();
 
-	if (getenv("ZCONF_DEBUG"))
+	if (conf_getenv("ZCONF_DEBUG"))
 		yydebug = 1;
 	yyparse();
 
@@ -515,7 +515,7 @@ void conf_parse(const char *name)
 		modules_sym = sym_find( "n" );
 
 	if (!menu_has_prompt(&rootmenu)) {
-		char *prompt = getenv("KCONFIG_MAINMENU");
+		char *prompt = conf_getenv("KCONFIG_MAINMENU");
 		if (!prompt)
 			prompt = "Main menu";
 		current_entry = &rootmenu;

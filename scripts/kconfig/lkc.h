@@ -45,7 +45,7 @@ struct gstr {
 #endif
 static inline const char *CONFIG_prefix(void)
 {
-	const char *v = getenv("CONFIG_");
+	const char *v = conf_getenv("CONFIG_");
 	return v ? v : CONFIG_;
 }
 #undef CONFIG_
