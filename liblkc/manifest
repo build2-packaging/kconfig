@@ -8,7 +8,7 @@ license: GPL-2.0-only
 description-file: README.md
 url: https://github.com/build2-packaging/kconfig/
 email: boris@codesynthesis.com
-build-warning-email: builds@build2.org
+build-error-email: builds@build2.org
 builds: all
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0

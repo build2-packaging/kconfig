@@ -10,5 +10,13 @@ exe{kconfig-conf}: getopt/{h c}{getopt}: include = $getopt
 if $getopt
   c.poptions =+ "-I($src_base/getopt)"
 
-if ($c.class == 'gcc')
-  c.coptions += -Wno-extra -Wno-error
+# Disable warnings.
+#
+switch $c.class
+{
+  case 'gcc'
+    c.coptions += -Wno-extra -Wno-error
+
+  case 'msvc'
+    c.coptions += /w
+}

@@ -1,14 +1,15 @@
 : 1
-name: kconfig-conf
+name: kconfig-qconf
 version: 0.1.0-a.0.z
 project: kconfig
-summary: Linux kernel configuration system basic configurator
+summary: Linux kernel configuration system graphical configurator
 license: GPL-2.0-only
 description-file: README.md
 url: https://github.com/build2-packaging/kconfig/
 email: boris@codesynthesis.com
 build-error-email: builds@build2.org
-builds: all
+builds: none ; Requires not yet packaged Qt5.
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0
 depends: liblkc == $
+requires: qt5

@@ -106,8 +106,21 @@ objs{*}: c.poptions += -DLIBLKC_SHARED_BUILD
 
 regex/obj{regex}: c.poptions += -DSTDC_HEADERS -DREGEX_MALLOC
 
-if ($c.class == 'gcc')
-  c.coptions += -Wno-extra -Wno-error
+# Disable warnings.
+#
+switch $c.class
+{
+  case 'gcc'
+  {
+    c.coptions += -Wno-extra -Wno-error
+
+    if $windows
+      c.coptions += -Wno-deprecated-declarations
+  }
+
+  case 'msvc'
+    c.coptions += /w
+}
 
 # Export options.
 #

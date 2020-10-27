@@ -1,0 +1,7 @@
+project = kconfig-qconf
+
+using version
+using config
+using test
+using install
+using dist
