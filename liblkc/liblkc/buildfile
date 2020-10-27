@@ -46,7 +46,7 @@ if ($flex != [null] && $bison != [null])
 
     # Backlink in the source directory for convenience of development.
     #
-    backlink = true
+    backlink = copy
   }
 }
 
