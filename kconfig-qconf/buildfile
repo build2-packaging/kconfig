@@ -1,0 +1,48 @@
+# @@ This is temporary until we package Qt.
+#
+if ($build.host.class != 'windows')
+{
+  # This is how the Linux kernel does it. Of course, there is no guarantee
+  # that moc we find this way matches the libraries we import below. But it's
+  # definitely an improvement over just importing moc since in that case we
+  # are as likely to end up with the Qt4 version.
+  #
+  moc = exe{([dir_path] $process.run(pkg-config --variable=host_bins Qt5Core))/moc}
+}
+else
+{
+  import! moc = qt5%exe{moc}
+}
+
+import libs  = qt5%lib{Qt5Core}
+import libs += qt5%lib{Qt5Gui}
+import libs += qt5%lib{Qt5Widgets}
+import libs += liblkc%lib{lkc}
+
+./: exe{kconfig-qconf} doc{README.md} legal{LICENSE} manifest
+
+exe{kconfig-qconf}: {hxx cxx}{qconf} cxx{qconf-moc} {h c}{images} \
+  h{lkc expr} $libs
+
+cxx{qconf-moc}: hxx{qconf} $moc
+{{
+  diag moc ($<[0])
+  $moc -o $path($>) $path($<[0])
+}}
+
+# @@ Need to investigate why.
+#
+obj{qconf qconf-moc}: cc.reprocess = true
+
+cc.poptions =+ "-I$out_base" "-I$src_base"
+
+# Disable warnings.
+#
+switch $cxx.class
+{
+  case 'gcc'
+    cc.coptions += -Wno-extra -Wno-error
+
+  case 'msvc'
+    cc.coptions += /w
+}
