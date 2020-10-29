@@ -1,10 +1,10 @@
+#include <liblkc/lkc.h>
+#include <liblkc/version.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-#include <liblkc/lkc.h>
-#include <liblkc/version.h>
 
 static int
 compare_symbols (const void* x, const void* y)
