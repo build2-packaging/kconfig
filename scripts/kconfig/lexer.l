@@ -20,6 +20,21 @@
 
 #define START_STRSIZE	16
 
+#ifdef _WIN32
+#define YY_NO_UNISTD_H
+#define YY_INPUT(buf,result,max_size) \
+	result = fread(buf, 1, max_size, yyin); \
+	if (!result) \
+	{ \
+		if (ferror(yyin)) \
+			YY_FATAL_ERROR( "input in flex scanner failed" ); \
+		result = YY_NULL; \
+}
+#ifndef PATH_MAX
+#define PATH_MAX _MAX_PATH /* <stdlib.h> */
+#endif
+#endif
+
 static struct {
 	struct file *file;
 	int lineno;
@@ -371,6 +386,14 @@ static void zconf_endhelp(void)
 	BEGIN(INITIAL);
 }
 
+static inline bool is_absolute(const char *path)
+{
+#ifndef _WIN32
+        return *path == '/';
+#else
+	return path[0] != '\0' && path[1] == ':';
+#endif
+}
 
 /*
  * Try to open specified file with following names:
@@ -386,7 +409,7 @@ FILE *zconf_fopen(const char *name)
 	FILE *f;
 
 	f = fopen(name, "r");
-	if (!f && name != NULL && name[0] != '/') {
+	if (!f && name != NULL && !is_absolute(name)) {
 		env = conf_getenv(SRCTREE);
 		if (env) {
 			snprintf(fullname, sizeof(fullname),
