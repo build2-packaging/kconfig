@@ -9,10 +9,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 #include <getopt.h>
-#include <sys/time.h>
 #include <errno.h>
+
+#ifndef _WIN32
+
+#include <unistd.h>
+#include <sys/time.h>
+
+#else
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <io.h>
+#define isatty _isatty
+
+#ifndef PATH_MAX
+#define PATH_MAX _MAX_PATH /* <stdlib.h> */
+#endif
+
+#endif
 
 #include "lkc.h"
 
@@ -98,6 +115,7 @@ static void set_randconfig_seed(void)
 	}
 
 	if (!seed_set) {
+#ifndef _WIN32
 		struct timeval now;
 
 		/*
@@ -106,6 +124,13 @@ static void set_randconfig_seed(void)
 		 */
 		gettimeofday(&now, NULL);
 		seed = (now.tv_sec + 1) * (now.tv_usec + 1);
+#else
+                SYSTEMTIME sys_now;
+                FILETIME now;
+                GetSystemTime(&sys_now);
+                SystemTimeToFileTime(&sys_now, &now);
+                seed = (unsigned int)now.dwLowDateTime;
+#endif
 	}
 
 	printf("KCONFIG_SEED=0x%X\n", seed);
