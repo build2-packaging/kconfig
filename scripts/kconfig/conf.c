@@ -12,8 +12,24 @@
 #include <getopt.h>
 #include <errno.h>
 
+#ifndef _WIN32
+
 #include <unistd.h>
 #include <sys/time.h>
+
+#else
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <io.h>
+#define isatty _isatty
+
+#ifndef PATH_MAX
+#define PATH_MAX _MAX_PATH /* <stdlib.h> */
+#endif
+
+#endif
 
 #include "lkc.h"
 
@@ -527,7 +543,6 @@ int main(int ac, char **av)
 			break;
 		case randconfig:
 		{
-			struct timeval now;
 			unsigned int seed;
 			char *seed_env;
 
@@ -535,8 +550,17 @@ int main(int ac, char **av)
 			 * Use microseconds derived seed,
 			 * compensate for systems where it may be zero
 			 */
+#ifndef _WIN32
+			struct timeval now;
 			gettimeofday(&now, NULL);
 			seed = (unsigned int)((now.tv_sec + 1) * (now.tv_usec + 1));
+#else
+			SYSTEMTIME sys_now;
+			FILETIME now;
+			GetSystemTime(&sys_now);
+			SystemTimeToFileTime(&sys_now, &now);
+			seed = (unsigned int)now.dwLowDateTime;
+#endif
 
 			seed_env = getenv("KCONFIG_SEED");
 			if( seed_env && *seed_env ) {

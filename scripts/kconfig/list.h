@@ -16,10 +16,21 @@
  * @member:     the name of the member within the struct.
  *
  */
+/*
 #define container_of(ptr, type, member) ({                      \
 	const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
 	(type *)( (char *)__mptr - offsetof(type,member) );})
+*/
+#ifdef __GNUC__
+#define member_of(ptr, type, member)                                           \
+	((const typeof(((type *)0)->member) *)(ptr))
+#else
+#define member_of(ptr, type, member) ((const struct list_head *)(ptr))
+#endif
 
+#define container_of(ptr, type, member)                                        \
+	((type *)((char *)member_of(ptr, type, member) -                       \
+		  offsetof(type, member)))
 
 struct list_head {
 	struct list_head *next, *prev;
