@@ -331,6 +331,7 @@ void sym_calc_value(struct symbol *sym)
 	struct symbol_value newval, oldval;
 	struct property *prop;
 	struct expr *e;
+	int oldflags;
 
 	if (!sym)
 		return;
@@ -345,9 +346,11 @@ void sym_calc_value(struct symbol *sym)
 		sym_calc_value(prop_get_symbol(prop));
 	}
 
-	sym->flags |= SYMBOL_VALID;
-
 	oldval = sym->curr;
+	oldflags = sym->flags;
+
+	sym->flags &= ~SYMBOL_CURR_FREE;
+	sym->flags |= SYMBOL_VALID;
 
 	switch (sym->type) {
 	case S_INT:
@@ -362,6 +365,8 @@ void sym_calc_value(struct symbol *sym)
 	default:
 		sym->curr.val = sym->name;
 		sym->curr.tri = no;
+		if (oldflags & SYMBOL_CURR_FREE)
+			free(oldval.val);
 		return;
 	}
 	sym->flags &= ~SYMBOL_WRITE;
@@ -468,6 +473,9 @@ void sym_calc_value(struct symbol *sym)
 
 	if (sym->flags & SYMBOL_NEED_SET_CHOICE_VALUES)
 		set_all_choice_values(sym);
+
+	if (oldflags & SYMBOL_CURR_FREE)
+		free(oldval.val);
 }
 
 void sym_clear_all_valid(void)
