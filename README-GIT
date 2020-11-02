@@ -1,0 +1,4 @@
+The checked out liblkc/liblkc/version.h may be overwritten during the build
+process but these changes should be ignored. To do this automatically, run:
+
+git update-index --assume-unchanged liblkc/liblkc/version.h
