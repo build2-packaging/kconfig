@@ -879,12 +879,12 @@ int conf_write(const char *name)
 		name = conf_get_configname();
 
 	if (!*name) {
-		fprintf(stderr, "config name is empty\n");
+		fprintf(stderr, "error: config file name is empty\n");
 		return -1;
 	}
 
 	if (is_dir(name)) {
-		fprintf(stderr, "%s: is a directory\n", name);
+		fprintf(stderr, "error: %s is a directory\n", name);
 		return -1;
 	}
 

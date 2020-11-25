@@ -309,18 +309,18 @@ static void sym_warn_unmet_dep(struct symbol *sym)
 	struct gstr gs = str_new();
 
 	str_printf(&gs,
-		   "\nWARNING: unmet direct dependencies detected for %s\n",
+		   "warning: unmet direct dependencies detected for %s\n",
 		   sym->name);
 	str_printf(&gs,
-		   "  Depends on [%c]: ",
+		   "  info: depends on [%c]: ",
 		   sym->dir_dep.tri == mod ? 'm' : 'n');
 	expr_gstr_print(sym->dir_dep.expr, &gs);
 	str_printf(&gs, "\n");
 
 	expr_gstr_print_revdep(sym->rev_dep.expr, &gs, yes,
-			       "  Selected by [y]:\n");
+			       "  info: selected by [y]:\n");
 	expr_gstr_print_revdep(sym->rev_dep.expr, &gs, mod,
-			       "  Selected by [m]:\n");
+			       "  info: selected by [m]:\n");
 
 	fputs(str_get(&gs), stderr);
 }
@@ -1068,7 +1068,7 @@ static void sym_check_print_recursive(struct symbol *last_sym)
 		if (stack->sym == last_sym)
 			break;
 	if (!stack) {
-		fprintf(stderr, "unexpected recursive dependency error\n");
+		fprintf(stderr, "error: unexpected recursive dependency\n");
 		return;
 	}
 
@@ -1088,42 +1088,42 @@ static void sym_check_print_recursive(struct symbol *last_sym)
 			}
 		}
 		if (stack->sym == last_sym)
-			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
+			fprintf(stderr, "%s:%d: error: recursive dependency detected\n",
 				prop->file->name, prop->lineno);
 
 		if (sym_is_choice(sym)) {
-			fprintf(stderr, "%s:%d:\tchoice %s contains symbol %s\n",
+			fprintf(stderr, "  %s:%d: info: choice %s contains symbol %s\n",
 				menu->file->name, menu->lineno,
 				sym->name ? sym->name : "<choice>",
 				next_sym->name ? next_sym->name : "<choice>");
 		} else if (sym_is_choice_value(sym)) {
-			fprintf(stderr, "%s:%d:\tsymbol %s is part of choice %s\n",
+			fprintf(stderr, "  %s:%d: info: symbol %s is part of choice %s\n",
 				menu->file->name, menu->lineno,
 				sym->name ? sym->name : "<choice>",
 				next_sym->name ? next_sym->name : "<choice>");
 		} else if (stack->expr == &sym->dir_dep.expr) {
-			fprintf(stderr, "%s:%d:\tsymbol %s depends on %s\n",
+			fprintf(stderr, "  %s:%d: info: symbol %s depends on %s\n",
 				prop->file->name, prop->lineno,
 				sym->name ? sym->name : "<choice>",
 				next_sym->name ? next_sym->name : "<choice>");
 		} else if (stack->expr == &sym->rev_dep.expr) {
-			fprintf(stderr, "%s:%d:\tsymbol %s is selected by %s\n",
+			fprintf(stderr, "  %s:%d: info: symbol %s is selected by %s\n",
 				prop->file->name, prop->lineno,
 				sym->name ? sym->name : "<choice>",
 				next_sym->name ? next_sym->name : "<choice>");
 		} else if (stack->expr == &sym->implied.expr) {
-			fprintf(stderr, "%s:%d:\tsymbol %s is implied by %s\n",
+			fprintf(stderr, "  %s:%d: info: symbol %s is implied by %s\n",
 				prop->file->name, prop->lineno,
 				sym->name ? sym->name : "<choice>",
 				next_sym->name ? next_sym->name : "<choice>");
 		} else if (stack->expr) {
-			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
+			fprintf(stderr, "  %s:%d: info: symbol %s %s value contains %s\n",
 				prop->file->name, prop->lineno,
 				sym->name ? sym->name : "<choice>",
 				prop_get_type_name(prop->type),
 				next_sym->name ? next_sym->name : "<choice>");
 		} else {
-			fprintf(stderr, "%s:%d:\tsymbol %s %s is visible depending on %s\n",
+			fprintf(stderr, "  %s:%d: info: symbol %s %s is visible depending on %s\n",
 				prop->file->name, prop->lineno,
 				sym->name ? sym->name : "<choice>",
 				prop_get_type_name(prop->type),
@@ -1132,8 +1132,8 @@ static void sym_check_print_recursive(struct symbol *last_sym)
 	}
 
 	fprintf(stderr,
-		"For a resolution refer to Documentation/kbuild/kconfig-language.rst\n"
-		"subsection \"Kconfig recursive dependency limitations\"\n"
+		"info: for a resolution refer to Documentation/kbuild/kconfig-language.rst "
+		"subsection \"Kconfig recursive dependency limitations\""
 		"\n");
 
 	if (check_top == &cv_stack)
@@ -1170,7 +1170,7 @@ static struct symbol *sym_check_expr_deps(struct expr *e)
 	default:
 		break;
 	}
-	fprintf(stderr, "Oops! How to check %d?\n", e->type);
+	fprintf(stderr, "error: how to check %d?\n", e->type);
 	return NULL;
 }
 

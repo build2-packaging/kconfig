@@ -1,6 +1,6 @@
-hello world 0
-Kconfig:8: hello world 1
-Kconfig:18: hello world 3
-Kconfig:22: hello world  4
-Kconfig:26: filename=Kconfig
-Kconfig:27: lineno=27
+Kconfig:4: info: hello world 0
+Kconfig:8: warning: hello world 1
+Kconfig:18: warning: hello world 3
+Kconfig:22: warning: hello world  4
+Kconfig:26: warning: filename=Kconfig
+Kconfig:27: warning: lineno=27

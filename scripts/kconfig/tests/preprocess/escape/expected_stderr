@@ -1,10 +1,10 @@
-Kconfig:9: hello, world
-Kconfig:13:   ' " '"   ' ''' "'"
-Kconfig:17: $
-Kconfig:18: $$
-Kconfig:20: 1
-Kconfig:25: $(X)
-Kconfig:30: (
-Kconfig:35: $(X)
-Kconfig:39: $(X)
-Kconfig:44: $(
+Kconfig:9: warning: hello, world
+Kconfig:13: warning:   ' " '"   ' ''' "'"
+Kconfig:17: warning: $
+Kconfig:18: warning: $$
+Kconfig:20: warning: 1
+Kconfig:25: warning: $(X)
+Kconfig:30: warning: (
+Kconfig:35: warning: $(X)
+Kconfig:39: warning: $(X)
+Kconfig:44: warning: $(

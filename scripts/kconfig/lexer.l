@@ -398,7 +398,7 @@ void zconf_initscan(const char *name)
 {
 	yyin = zconf_fopen(name);
 	if (!yyin) {
-		fprintf(stderr, "can't find file %s\n", name);
+		fprintf(stderr, "error: unable to find file %s\n", name);
 		exit(1);
 	}
 
@@ -419,7 +419,7 @@ void zconf_nextfile(const char *name)
 	current_buf->state = YY_CURRENT_BUFFER;
 	yyin = zconf_fopen(file->name);
 	if (!yyin) {
-		fprintf(stderr, "%s:%d: can't open file \"%s\"\n",
+		fprintf(stderr, "%s:%d: error: unable to open file \"%s\"\n",
 			zconf_curname(), zconf_lineno(), file->name);
 		exit(1);
 	}
@@ -433,13 +433,13 @@ void zconf_nextfile(const char *name)
 	for (iter = current_file; iter; iter = iter->parent) {
 		if (!strcmp(iter->name, file->name)) {
 			fprintf(stderr,
-				"recursive inclusion detected\n"
-				"inclusion path:\n"
-				"  current file : %s\n", file->name);
+				"error: recursive inclusion detected\n"
+				"  info: inclusion path:\n"
+				"    current file : %s\n", file->name);
 			iter = file;
 			do {
 				iter = iter->parent;
-				fprintf(stderr, "  included from: %s:%d\n",
+				fprintf(stderr, "    included from: %s:%d\n",
 					iter->name, iter->lineno - 1);
 			} while (strcmp(iter->name, file->name));
 			exit(1);

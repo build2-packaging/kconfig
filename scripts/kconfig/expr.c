@@ -95,7 +95,7 @@ struct expr *expr_copy(const struct expr *org)
 		break;
 	case E_LIST:
 	default:
-		fprintf(stderr, "can't copy type %d\n", e->type);
+		fprintf(stderr, "error: unable to copy type %d\n", e->type);
 		free(e);
 		e = NULL;
 		break;
@@ -132,7 +132,7 @@ void expr_free(struct expr *e)
 		expr_free(e->left.expr); /* right is sym */
 		break;
 	default:
-		fprintf(stderr, "how to free type %d?\n", e->type);
+		fprintf(stderr, "error: how to free type %d?\n", e->type);
 		break;
 	}
 	free(e);
@@ -727,7 +727,7 @@ struct expr *expr_transform(struct expr *e)
 			break;
 		}
 		if (e->right.sym == &symbol_mod) {
-			fprintf(stderr, "boolean symbol %s tested for 'm'? test forced to 'n'\n", e->left.sym->name);
+			fprintf(stderr, "warning: boolean symbol %s tested for 'm'? test forced to 'n'\n", e->left.sym->name);
 			e->type = E_SYMBOL;
 			e->left.sym = &symbol_no;
 			e->right.sym = NULL;
@@ -748,7 +748,7 @@ struct expr *expr_transform(struct expr *e)
 			break;
 		}
 		if (e->right.sym == &symbol_mod) {
-			fprintf(stderr, "boolean symbol %s tested for 'm'? test forced to 'y'\n", e->left.sym->name);
+			fprintf(stderr, "warning: boolean symbol %s tested for 'm'? test forced to 'y'\n", e->left.sym->name);
 			e->type = E_SYMBOL;
 			e->left.sym = &symbol_yes;
 			e->right.sym = NULL;
@@ -1065,7 +1065,7 @@ tristate expr_calc_value(struct expr *e)
 	case E_UNEQUAL:
 		break;
 	default:
-		fprintf(stderr, "expr_calc_value: %d?\n", e->type);
+		fprintf(stderr, "error: expr_calc_value: %d?\n", e->type);
 		return no;
 	}
 
@@ -1100,7 +1100,7 @@ tristate expr_calc_value(struct expr *e)
 	case E_UNEQUAL:
 		return res ? yes : no;
 	default:
-		fprintf(stderr, "expr_calc_value: relation %d?\n", e->type);
+		fprintf(stderr, "error: expr_calc_value: relation %d?\n", e->type);
 		return no;
 	}
 }
@@ -1135,7 +1135,7 @@ static int expr_compare_type(enum expr_type t1, enum expr_type t2)
 	default:
 		return -1;
 	}
-	fprintf(stderr, "[%dgt%d?]", t1, t2);
+	fprintf(stderr, "error: [%dgt%d?]\n", t1, t2);
 	return 0;
 }
 

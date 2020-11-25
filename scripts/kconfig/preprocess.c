@@ -21,7 +21,7 @@ static void __attribute__((noreturn)) pperror(const char *format, ...)
 {
 	va_list ap;
 
-	fprintf(stderr, "%s:%d: ", current_file->name, yylineno);
+	fprintf(stderr, "%s:%d: error: ", current_file->name, yylineno);
 	va_start(ap, format);
 	vfprintf(stderr, format, ap);
 	va_end(ap);
@@ -132,7 +132,8 @@ static char *do_filename(int argc, char *argv[])
 
 static char *do_info(int argc, char *argv[])
 {
-	fprintf(stderr, "%s\n", argv[0]);
+	fprintf(stderr, "%s:%d: info: %s\n",
+			current_file->name, yylineno, argv[0]);
 
 	return xstrdup("");
 }
@@ -189,7 +190,7 @@ static char *do_shell(int argc, char *argv[])
 static char *do_warning_if(int argc, char *argv[])
 {
 	if (!strcmp(argv[0], "y"))
-		fprintf(stderr, "%s:%d: %s\n",
+		fprintf(stderr, "%s:%d: warning: %s\n",
 			current_file->name, yylineno, argv[1]);
 
 	return xstrdup("");
