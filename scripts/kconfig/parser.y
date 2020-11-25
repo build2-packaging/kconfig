@@ -110,7 +110,7 @@ static struct menu *current_menu, *current_entry;
 %type <flavor> assign_op
 
 %destructor {
-	fprintf(stderr, "%s:%d: missing end statement for this entry\n",
+	fprintf(stderr, "%s:%d: error: missing end statement for this entry\n",
 		$$->file->name, $$->lineno);
 	if (current_menu == $$)
 		menu_end_menu();
@@ -544,7 +544,7 @@ static bool zconf_endtoken(const char *tokenname,
 	if (current_menu->file != current_file) {
 		zconf_error("'%s' in different file than '%s'",
 			    tokenname, expected_tokenname);
-		fprintf(stderr, "%s:%d: location of the '%s'\n",
+		fprintf(stderr, "  %s:%d: info: location of '%s'\n",
 			current_menu->file->name, current_menu->lineno,
 			expected_tokenname);
 		yynerrs++;
@@ -569,7 +569,7 @@ static void zconf_error(const char *err, ...)
 	va_list ap;
 
 	yynerrs++;
-	fprintf(stderr, "%s:%d: ", zconf_curname(), zconf_lineno());
+	fprintf(stderr, "%s:%d: error: ", zconf_curname(), zconf_lineno());
 	va_start(ap, err);
 	vfprintf(stderr, err, ap);
 	va_end(ap);
@@ -578,7 +578,7 @@ static void zconf_error(const char *err, ...)
 
 static void yyerror(const char *err)
 {
-	fprintf(stderr, "%s:%d: %s\n", zconf_curname(), zconf_lineno() + 1, err);
+	fprintf(stderr, "%s:%d: error: %s\n", zconf_curname(), zconf_lineno() + 1, err);
 }
 
 static void print_quoted_string(FILE *out, const char *str)

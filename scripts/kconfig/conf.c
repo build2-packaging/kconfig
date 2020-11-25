@@ -76,7 +76,7 @@ static void strip(char *str)
 static void xfgets(char *str, int size, FILE *in)
 {
 	if (!fgets(str, size, in))
-		fprintf(stderr, "\nError in reading or end of file.\n");
+		fprintf(stderr, "error: unable to read or end of file\n");
 
 	if (!tty_stdio)
 		printf("%s", str);
@@ -568,7 +568,7 @@ int main(int ac, char **av)
 		}
 	}
 	if (ac == optind) {
-		fprintf(stderr, "%s: Kconfig file missing\n", av[0]);
+		fprintf(stderr, "%s: error: Kconfig file missing\n", av[0]);
 		conf_usage(progname);
 		exit(1);
 	}
@@ -580,9 +580,7 @@ int main(int ac, char **av)
 	case defconfig:
 		if (conf_read(defconfig_file)) {
 			fprintf(stderr,
-				"***\n"
-				  "*** Can't find default configuration \"%s\"!\n"
-				  "***\n",
+				  "error: unable to find default configuration \"%s\"\n",
 				defconfig_file);
 			exit(1);
 		}
@@ -609,7 +607,7 @@ int main(int ac, char **av)
 		if ((strcmp(name, "") != 0) && (strcmp(name, "1") != 0)) {
 			if (conf_read_simple(name, S_DEF_USER)) {
 				fprintf(stderr,
-					"*** Can't read seed configuration \"%s\"!\n",
+					"error: unable to read seed configuration \"%s\"\n",
 					name);
 				exit(1);
 			}
@@ -626,7 +624,7 @@ int main(int ac, char **av)
 		if (conf_read_simple(name, S_DEF_USER) &&
 		    conf_read_simple("all.config", S_DEF_USER)) {
 			fprintf(stderr,
-				"*** KCONFIG_ALLCONFIG set, but no \"%s\" or \"all.config\" file found\n",
+				"error: KCONFIG_ALLCONFIG set, but no \"%s\" or \"all.config\" file found\n",
 				name);
 			exit(1);
 		}
@@ -640,7 +638,7 @@ int main(int ac, char **av)
 		if (name && *name) {
 			if (conf_get_changed()) {
 				fprintf(stderr,
-					"\n*** The configuration requires explicit update.\n\n");
+					"error: the configuration requires explicit update\n");
 				return 1;
 			}
 			no_conf_write = 1;
@@ -697,13 +695,13 @@ int main(int ac, char **av)
 
 	if (input_mode == savedefconfig) {
 		if (conf_write_defconfig(defconfig_file)) {
-			fprintf(stderr, "n*** Error while saving defconfig to: %s\n\n",
+			fprintf(stderr, "error: unable to save defconfig to \"%s\"\n",
 				defconfig_file);
 			return 1;
 		}
 	} else if (input_mode != listnewconfig && input_mode != helpnewconfig) {
 		if (!no_conf_write && conf_write(NULL)) {
-			fprintf(stderr, "\n*** Error during writing of the configuration.\n\n");
+			fprintf(stderr, "error: unable to write the configuration\n");
 			exit(1);
 		}
 
@@ -718,7 +716,7 @@ int main(int ac, char **av)
 		 */
 		if (conf_write_autoconf(sync_kconfig) && sync_kconfig) {
 			fprintf(stderr,
-				"\n*** Error during sync of the configuration.\n\n");
+				"error: unable to sync the configuration\n");
 			return 1;
 		}
 	}

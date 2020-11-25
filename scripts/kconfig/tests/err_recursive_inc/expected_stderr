@@ -1,6 +1,6 @@
-recursive inclusion detected
-inclusion path:
-  current file : Kconfig.inc1
-  included from: Kconfig.inc3:2
-  included from: Kconfig.inc2:4
-  included from: Kconfig.inc1:5
+error: recursive inclusion detected
+  info: inclusion path:
+    current file : Kconfig.inc1
+    included from: Kconfig.inc3:2
+    included from: Kconfig.inc2:4
+    included from: Kconfig.inc1:5

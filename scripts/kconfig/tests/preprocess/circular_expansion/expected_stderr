@@ -1,1 +1,1 @@
-Kconfig:5: recursive variable 'X' references itself (eventually)
+Kconfig:5: error: recursive variable 'X' references itself (eventually)
