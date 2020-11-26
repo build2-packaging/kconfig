@@ -62,13 +62,13 @@ def{lkc}: h{lkc lkc_proto}
   #
   # 1. Get rid of inline function prototypes.
   # 2. Extract names from function prototypes.
-  # 3. Filter out x-names (xmalloc(), etc), _*-names and add leading speces.
+  # 3. Filter out _*-names and add leading spaces.
   #
   #
   cat $h                                                    | \
     sed    -e 's/.+ inline .+//'                            | \
     sed -n -e 's/^[a-z][^(]+ \*?([a-z0-9_]+)\(.*[;,]$/\1/p' | \
-    sed -n -e 's/^([^x_].+)$/  \1/p'                        >>$d
+    sed -n -e 's/^([^_].+)$/  \1/p'                         >>$d
 
   # Variables:
   #
