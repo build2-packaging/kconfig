@@ -274,9 +274,11 @@ n	[A-Za-z0-9_-]
 <<EOF>>	{
 	BEGIN(INITIAL);
 
-	if (prev_token != T_EOL && prev_token != T_HELPTEXT)
-		fprintf(stderr, "%s:%d: warning: no new line at end of file\n",
+	if (prev_token != T_EOL && prev_token != T_HELPTEXT) {
+		fprintf(stderr, "%s:%d: no new line at end of file\n",
 			current_file->name, yylineno);
+		exit(1);
+	}
 
 	if (current_file) {
 		zconf_endfile();
