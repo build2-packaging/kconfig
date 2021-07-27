@@ -10,7 +10,7 @@ email: boris@codesynthesis.com
 build-error-email: builds@build2.org
 #builds: host
 builds: none ; Requires not yet packaged Qt5.
-depends: * build2 >= 0.13.0
-depends: * bpkg >= 0.13.0
+depends: * build2 >= 0.14.0-
+depends: * bpkg >= 0.14.0-
 depends: liblkc == $
 requires: qt5
