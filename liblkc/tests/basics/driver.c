@@ -15,7 +15,7 @@ compare_symbols (const void* x, const void* y)
 
 int main (int argc, const char* argv[])
 {
-  if (argc < 3 && argc > 4)
+  if (argc < 3 || argc > 4)
   {
     fprintf (stderr,
              "usage: %s <kconfig-file> <config-file> [<iterations>]\n",
