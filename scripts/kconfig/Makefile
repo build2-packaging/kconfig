@@ -6,10 +6,12 @@ conf: conf.o parser.tab.o lexer.lex.o confdata.o expr.o preprocess.o symbol.o ut
 	$(CC) -o $@ $^
 
 parser.tab.c: parser.y
-	bison -oparser.tab.c -d -t -l parser.y
+	bison -l -t -d -o parser.tab.c parser.y
+        #byacc -l -t -d -o parser.tab.c parser.y
 
 lexer.lex.c: lexer.l parser.tab.c # For parsr.tab.h.
-	flex -olexer.lex.c -L lexer.l
+	flex -f -L -o lexer.lex.c lexer.l
+        #reflex -L -o lexer.lex.c lexer.l
 
 .PHONY: test
 test: conf
