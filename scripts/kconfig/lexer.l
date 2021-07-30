@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
  */
-%option nostdinit noyywrap never-interactive full ecs
+%option nostdinit noyywrap never-interactive ecs
 %option 8bit yylineno
 %x ASSIGN_VAL HELP STRING
 %{
