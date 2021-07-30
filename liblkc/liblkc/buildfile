@@ -32,7 +32,7 @@ if ($flex != [null] && $bison != [null])
   c{lexer.lex...}: l{lexer} h{parser.tab...} $flex
   {{
     diag flex ($<[0])
-    $flex -o $path($>) -L $path($<[0])
+    $flex -o $path($>) -L -f $path($<[0])
   }}
 
   {h c}{parser.tab...} c{lexer.lex...}:
