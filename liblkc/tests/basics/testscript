@@ -1,5 +1,8 @@
 test.arguments += Kconfig
 
+# Note that we run two iterations of each test to shake out any parser
+# reusability issues.
+
 : basics
 :
 cat <<EOI >=Kconfig;
@@ -18,7 +21,11 @@ CONFIG_FOO=n
 CONFIG_BAR=y
 CONFIG_BAZ=y
 EOI
-$* config >>EOO
+$* config 2 >>EOO
+BAR bool y
+BAZ bool y
+FOO bool n
+
 BAR bool y
 BAZ bool y
 FOO bool n
@@ -45,7 +52,12 @@ CONFIG_INT=-1234
 CONFIG_HEX=0xdeadbeef
 CONFIG_STR="The \"Hello, World\" example"
 EOI
-$* config >>EOO
+$* config 2 >>EOO
+HEX hex 0xdeadbeef
+INT int -1234
+STR string The "Hello, World" example
+STR_HELPER string foobar
+
 HEX hex 0xdeadbeef
 INT int -1234
 STR string The "Hello, World" example
@@ -75,7 +87,12 @@ EOI
 cat <<EOI >=config;
 CONFIG_BZIP2=y
 EOI
-$* config >>EOO
+$* config 2 >>EOO
+BZIP2 bool y
+COMPRESSION_CHOICE bool y
+GZIP bool n
+HAVE_COMPRESSION bool y
+
 BZIP2 bool y
 COMPRESSION_CHOICE bool y
 GZIP bool n
@@ -108,8 +125,40 @@ CONFIG_FOO=n
 CONFIG_BAR=y
 CONFIG_BAZ=y
 EOI
-env "SRC_ROOT=$~" -- $* config >>EOO
+env "SRC_ROOT=$~" -- $* config 2 >>EOO
+BAR bool y
+BAZ bool y
+FOO bool n
+
 BAR bool y
 BAZ bool y
 FOO bool n
 EOO
+
+: warning
+:
+cat <<EOI >=Kconfig;
+config FOO
+	bool "Foo support"
+        help
+          one
+        help
+          two
+
+config BAR
+	bool "Bar support"
+EOI
+cat <<EOI >=config;
+CONFIG_FOO=y
+CONFIG_BAR=n
+EOI
+$* config 2 >>EOO 2>>EOE
+BAR bool n
+FOO bool y
+
+BAR bool n
+FOO bool y
+EOO
+Kconfig:8: warning: 'FOO' defined with more than one help text -- only the last one will be used
+Kconfig:8: warning: 'FOO' defined with more than one help text -- only the last one will be used
+EOE

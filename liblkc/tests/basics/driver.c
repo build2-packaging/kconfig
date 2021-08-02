@@ -83,6 +83,9 @@ int main (int argc, const char* argv[])
       qsort ((void*)symbols, n, sizeof(*symbols), compare_symbols);
     }
 
+    if (it != 0)
+      fputc ('\n', stdout);
+
     size_t i;
     for (i = 0; i != n; i++)
     {
