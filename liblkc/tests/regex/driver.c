@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include <liblkc/lkc.h>
+
+#undef NDEBUG
+#include <assert.h>
 
 int main (int argc, const char* argv[])
 {
