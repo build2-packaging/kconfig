@@ -9,6 +9,6 @@ url: https://github.com/build2-packaging/kconfig/
 email: boris@codesynthesis.com
 build-error-email: builds@build2.org
 builds: host
-depends: * build2 >= 0.14.0-
-depends: * bpkg >= 0.14.0-
+depends: * build2 >= 0.14.0
+depends: * bpkg >= 0.14.0
 depends: liblkc == $
