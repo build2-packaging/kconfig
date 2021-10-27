@@ -1,0 +1,7 @@
+: 1
+name: kconfig-qconf
+version: 0.1.0
+upstream-version: 5.11
+project: kconfig
+summary: Linux kernel configuration system graphical configurator
+license: GPL-2.0-only
