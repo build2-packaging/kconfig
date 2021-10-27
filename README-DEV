@@ -4,6 +4,4 @@ Things to check when upgrading to new upstream:
 
 - Check for memory leaks and re-execution issues on kernel .config.
 
-- Check for new function prototypes that could break .def file.
-
 - Check CRLF handling in lexer.

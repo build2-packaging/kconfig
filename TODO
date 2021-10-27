@@ -1,3 +1,0 @@
-- Redo Windows symbol exporting using new auto-symexport support
-  (requires a fix for common symbol exporting, otherwise done in
-  auto-symexport branch).
