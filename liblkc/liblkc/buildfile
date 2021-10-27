@@ -9,11 +9,12 @@ l{*}: extension = l
 
 windows = ($c.target.class == 'windows')
 
-lib{lkc}: {h c}{* -menu -parser.tab... -lexer.lex... -version} \
-          {h c}{parser.tab...} c{lexer.lex...} h{version}
-lib{lkc}: c{menu}:            include = adhoc # Included by parser.y.
+lib{lkc}: libul{lkc}: {h c}{* -menu -parser.tab... -lexer.lex... -version} \
+                      {h c}{parser.tab...} c{lexer.lex...} h{version}
+libul{lkc}: c{menu}:          include = adhoc # Included by parser.y.
 lib{lkc}: regex/{h c}{regex}: include = $windows
 libs{lkc}: def{lkc}:          include = $windows
+def{lkc}: libul{lkc}
 
 # Note: the kernel's makefile (Makefile.host) always passes -t (instrument the
 # parser for tracing) and -l/-L (don't generate #line directives). It's not
@@ -37,36 +38,6 @@ c{lexer.lex...}: l{lexer} h{parser.tab...} $flex
 # Backlink in the source directory for convenience of development.
 #
 {h c}{parser.tab...} c{lexer.lex...}: backlink = true
-
-def{lkc}: h{lkc lkc_proto}
-{{
-  diag gen $>
-  d = $path($>)
-  h = $path($<)
-  echo '; Auto-generated, do not edit.' >$d
-  echo 'EXPORTS'                       >>$d
-
-  # Functions:
-  #
-  # 1. Get rid of inline function prototypes.
-  # 2. Extract names from function prototypes.
-  # 3. Filter out _*-names and add leading spaces.
-  #
-  #
-  cat $h                                                    | \
-    sed    -e 's/.+ inline .+//'                            | \
-    sed -n -e 's/^[a-z][^(]+ \*?([a-z0-9_]+)\(.*[;,]$/\1/p' | \
-    sed -n -e 's/^([^_].+)$/  \1/p'                         >>$d
-
-  # Variables:
-  #
-  # 1. Extract names from extern variable declarations (can be an array).
-  # 2. Add leading spaces and trailing DATA.
-  #
-  cat $h                                                     | \
-    sed -n -e 's/^extern .+ \*?([a-z0-9_]+)(\[.+\])?;$/\1/p' | \
-    sed -n -e 's/^(.+)$/  \1 DATA/p'                         >>$d
-}}
 
 # Include the generated version header into the distribution (so that we don't
 # pick up an installed one) and don't remove it when cleaning in src (so that

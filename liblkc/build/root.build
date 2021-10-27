@@ -1,5 +1,10 @@
 using c
 
+# We use .def file to export symbols for all Windows targets.
+#
+if ($c.target.class == 'windows')
+  using bin.def
+
 h{*}: extension = h
 c{*}: extension = c
 
