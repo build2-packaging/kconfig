@@ -6,8 +6,8 @@
 #ifndef LKC_H
 #define LKC_H
 
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "export.h"
@@ -24,30 +24,16 @@ extern "C" {
 #define LKC_UNUSED(x) x
 #endif
 
-struct gstr {
-	size_t len;
-	char  *s;
-	/*
-	* when max_width is not zero long lines in string s (if any) get
-	* wrapped not to exceed the max_width value
-	*/
-	int max_width;
-};
-
 #include "lkc_proto.h"
 
 #define SRCTREE "srctree"
-
-#ifndef PACKAGE
-#define PACKAGE "linux"
-#endif
 
 #ifndef CONFIG_
 #define CONFIG_ "CONFIG_"
 #endif
 static inline const char *CONFIG_prefix(void)
 {
-	const char *v = getenv("CONFIG_");
+	const char *v = conf_getenv("CONFIG_");
 	return v ? v : CONFIG_;
 }
 #undef CONFIG_
@@ -56,16 +42,6 @@ static inline const char *CONFIG_prefix(void)
 #ifndef KCONFIG_AUTOCONFIG
 #define KCONFIG_AUTOCONFIG "include/config/auto.conf"
 #endif
-
-enum conf_def_mode {
-	def_default,
-	def_yes,
-	def_mod,
-	def_y2m,
-	def_m2y,
-	def_no,
-	def_random
-};
 
 LIBLKC_SYMEXPORT
 extern int yylineno;
@@ -80,11 +56,19 @@ void zconf_free(void);
 
 /* confdata.c */
 const char *conf_get_configname(void);
-void sym_set_change_count(int count);
-void sym_add_change_count(int count);
+void set_all_choice_values(struct symbol *csym);
+
+enum conf_def_mode {
+	def_default,
+	def_yes,
+	def_mod,
+	def_y2m,
+	def_m2y,
+	def_no,
+	def_random
+};
 bool conf_set_all_new_symbols(enum conf_def_mode mode);
 void conf_rewrite_mod_or_yes(enum conf_def_mode mode);
-void set_all_choice_values(struct symbol *csym);
 
 /* confdata.c and expr.c */
 static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
@@ -92,25 +76,8 @@ static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
 	assert(len != 0);
 
 	if (fwrite(str, len, count, out) != count)
-		fprintf(stderr, "error in writing or end of file\n");
+		fprintf(stderr, "error: unable to write or end of file\n");
 }
-
-/* menu.c */
-void _menu_init(void);
-void menu_warn(struct menu *menu, const char *fmt, ...);
-struct menu *menu_add_menu(void);
-void menu_end_menu(void);
-void menu_add_entry(struct symbol *sym);
-void menu_add_dep(struct expr *dep);
-void menu_add_visibility(struct expr *dep);
-struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
-void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
-void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep);
-void menu_add_option_modules(void);
-void menu_add_option_defconfig_list(void);
-void menu_add_option_allnoconfig_y(void);
-void menu_finalize(struct menu *parent);
-void menu_set_type(int type);
 
 /* util.c */
 struct file *file_lookup(const char *name);
@@ -123,11 +90,49 @@ char *xstrndup(const char *s, size_t n);
 /* lexer.l */
 int yylex(void);
 
+struct gstr {
+	size_t len;
+	char  *s;
+	/*
+	* when max_width is not zero long lines in string s (if any) get
+	* wrapped not to exceed the max_width value
+	*/
+	int max_width;
+};
 struct gstr str_new(void);
 void str_free(struct gstr *gs);
 void str_append(struct gstr *gs, const char *s);
 void str_printf(struct gstr *gs, const char *fmt, ...);
 const char *str_get(struct gstr *gs);
+
+/* menu.c */
+void _menu_init(void);
+void menu_warn(struct menu *menu, const char *fmt, ...);
+struct menu *menu_add_menu(void);
+void menu_end_menu(void);
+void menu_add_entry(struct symbol *sym);
+void menu_add_dep(struct expr *dep);
+void menu_add_visibility(struct expr *dep);
+struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
+void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
+void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep);
+void menu_finalize(struct menu *parent);
+void menu_set_type(int type);
+
+LIBLKC_SYMEXPORT
+extern struct menu rootmenu;
+
+bool menu_is_empty(struct menu *menu);
+bool menu_is_visible(struct menu *menu);
+bool menu_has_prompt(struct menu *menu);
+const char *menu_get_prompt(struct menu *menu);
+struct menu *menu_get_root_menu(struct menu *menu);
+struct menu *menu_get_parent_menu(struct menu *menu);
+bool menu_has_help(struct menu *menu);
+const char *menu_get_help(struct menu *menu);
+struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head);
+void menu_get_ext_help(struct menu *menu, struct gstr *help);
+void menu_free(struct menu *menu, int free);
 
 /* symbol.c */
 void sym_clear_all_valid(void);

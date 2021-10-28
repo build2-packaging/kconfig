@@ -9,9 +9,8 @@ l{*}: extension = l
 
 windows = ($c.target.class == 'windows')
 
-lib{lkc}: {h c}{* -menu -parser.tab... -lexer.lex... -version} \
+lib{lkc}: {h c}{* -parser.tab... -lexer.lex... -version} \
           {h c}{parser.tab...} c{lexer.lex...} h{version}
-lib{lkc}: c{menu}:            include = adhoc # Included by parser.y.
 lib{lkc}: regex/{h c}{regex}: include = $windows
 libs{lkc}: def{lkc}:          include = $windows
 
