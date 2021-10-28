@@ -133,7 +133,7 @@ static void set_randconfig_seed(void)
 #endif
 	}
 
-	printf("KCONFIG_SEED=0x%X\n", seed);
+	fprintf(stderr, "KCONFIG_SEED=0x%X\n", seed);
 	srand(seed);
 }
 
