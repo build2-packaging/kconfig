@@ -6,9 +6,6 @@
  * Copied from include/linux/...
  */
 
-#undef offsetof
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
-
 /**
  * container_of - cast a member of a structure out to the containing structure
  * @ptr:        the pointer to the member.
@@ -16,6 +13,23 @@
  * @member:     the name of the member within the struct.
  *
  */
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
+
+#  include <stddef.h> /* offsetof() */
+
+#  define member_of(ptr, type, member) ((const struct list_head *)(ptr))
+#  define container_of(ptr, type, member)                \
+	((type *)((char *)member_of(ptr, type, member) - \
+		  offsetof(type, member)))
+#else
+
+/* While this implementation works, the ((type*)0)->member construct is
+   undefined behavior that trips up UBSAN. */
+
+#undef offsetof
+#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+
+
 /*
 #define container_of(ptr, type, member) ({                      \
 	const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
@@ -31,6 +45,7 @@
 #define container_of(ptr, type, member)                                        \
 	((type *)((char *)member_of(ptr, type, member) -                       \
 		  offsetof(type, member)))
+#endif
 
 struct list_head {
 	struct list_head *next, *prev;
