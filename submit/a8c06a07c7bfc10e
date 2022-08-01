@@ -1,0 +1,7 @@
+: 1
+name: kconfig-conf
+version: 0.2.0
+upstream-version: 5.15
+project: kconfig
+summary: Linux kernel configuration system basic configurator
+license: GPL-2.0-only
