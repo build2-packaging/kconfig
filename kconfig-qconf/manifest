@@ -10,8 +10,6 @@ url: https://github.com/build2-packaging/kconfig/
 email: boris@codesynthesis.com
 build-error-email: builds@build2.org
 
-builds: host : &latest
-
 depends: * build2 >= 0.16.0
 depends: * bpkg >= 0.16.0
 
@@ -22,3 +20,39 @@ depends: * Qt6Moc                               ^6.4.0  ? ($config.kconfig_qconf
 depends: { libQt6Core libQt6Gui libQt6Widgets } ^6.4.0  ? ($config.kconfig_qconf.qt == 6)
 
 depends: liblkc == $
+
+# CI builds.
+#
+builds: host : &latest
+
+qt5-build-config: config.kconfig_qconf.qt=5
+
+sys-builds: sys : &latest
+sys-build-include: linux_debian*-**
+sys-build-include: linux_ubuntu*-**
+sys-build-include: linux_fedora*-**
+sys-build-exclude: **
+sys-build-config:
+\
+?sys:Qt6Moc
+?sys:libQt6Core
+?sys:libQt6Gui
+?sys:libQt6Widgets
+config.Qt6Moc=/usr/lib/qt6/libexec/moc
+\
+
+qt5-sys-builds: sys : &latest
+qt5-sys-build-include: linux_debian*-**
+qt5-sys-build-include: linux_ubuntu*-**
+qt5-sys-build-include: linux_fedora*-**
+qt5-sys-build-exclude: **
+qt5-sys-build-config:
+\
+config.kconfig_qconf.qt=5
+?sys:Qt5Moc
+?sys:libQt5Core
+?sys:libQt5Gui
+?sys:libQt5Widgets
+config.Qt5Moc=/usr/lib/qt5/bin/moc
+config.cxx.coptions+=-fPIC
+\
