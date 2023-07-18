@@ -13,6 +13,14 @@ cd kconfig
 bdep init --empty
 bdep config create @gcc ../kconfig-gcc cc
 bdep init @gcc -d liblkc -d kconfig-conf   # Answer Y to host config.
+
+# Debian
+#
 bdep init @gcc -d kconfig-qconf ?sys:Qt6Moc ?sys:libQt6Core ?sys:libQt6Gui ?sys:libQt6Widgets config.Qt6Moc=/usr/lib/qt6/libexec/moc
 bdep init @gcc -d kconfig-qconf ?sys:Qt5Moc ?sys:libQt5Core ?sys:libQt5Gui ?sys:libQt5Widgets config.Qt5Moc=/usr/lib/qt5/bin/moc config.cxx.coptions+=-fPIC config.kconfig_qconf.qt=5
+
+# Fedora
+#
+bdep init @gcc -d kconfig-qconf ?sys:Qt6Moc ?sys:libQt6Core ?sys:libQt6Gui ?sys:libQt6Widgets config.Qt6Moc=/usr/lib64/qt6/libexec/moc
+bdep init @gcc -d kconfig-qconf ?sys:Qt5Moc ?sys:libQt5Core ?sys:libQt5Gui ?sys:libQt5Widgets config.Qt5Moc=/usr/lib64/qt5/bin/moc config.cxx.coptions+=-fPIC config.kconfig_qconf.qt=5
 ```

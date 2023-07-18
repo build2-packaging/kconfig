@@ -27,12 +27,12 @@ builds: host : -static
 
 qt5-build-config: config.kconfig_qconf.qt=5
 
-sys-builds: sys : -static
-sys-build-include: linux_debian*-**
-sys-build-include: linux_ubuntu*-**
-sys-build-include: linux_fedora*-**
-sys-build-exclude: **
-sys-build-config:
+sys-debian-builds: sys : -static
+sys-debian-build-exclude: linux_debian_11-** ; Qt6 only available from backports.
+sys-debian-build-include: linux_debian*-**
+sys-debian-build-include: linux_ubuntu*-**
+sys-debian-build-exclude: **
+sys-debian-build-config:
 \
 ?sys:Qt6Moc
 ?sys:libQt6Core
@@ -41,12 +41,11 @@ sys-build-config:
 config.Qt6Moc=/usr/lib/qt6/libexec/moc
 \
 
-qt5-sys-builds: sys : -static
-qt5-sys-build-include: linux_debian*-**
-qt5-sys-build-include: linux_ubuntu*-**
-qt5-sys-build-include: linux_fedora*-**
-qt5-sys-build-exclude: **
-qt5-sys-build-config:
+qt5-sys-debian-builds: sys : -static
+qt5-sys-debian-build-include: linux_debian*-**
+qt5-sys-debian-build-include: linux_ubuntu*-**
+qt5-sys-debian-build-exclude: **
+qt5-sys-debian-build-config:
 \
 config.kconfig_qconf.qt=5
 ?sys:Qt5Moc
@@ -54,5 +53,31 @@ config.kconfig_qconf.qt=5
 ?sys:libQt5Gui
 ?sys:libQt5Widgets
 config.Qt5Moc=/usr/lib/qt5/bin/moc
+config.cxx.coptions+=-fPIC
+\
+
+sys-fedora-builds: sys : -static
+sys-fedora-build-include: linux_fedora*-**
+sys-fedora-build-exclude: **
+sys-fedora-build-config:
+\
+?sys:Qt6Moc
+?sys:libQt6Core
+?sys:libQt6Gui
+?sys:libQt6Widgets
+config.Qt6Moc=/usr/lib64/qt6/libexec/moc
+\
+
+qt5-sys-fedora-builds: sys : -static
+qt5-sys-fedora-build-include: linux_fedora*-**
+qt5-sys-fedora-build-exclude: **
+qt5-sys-fedora-build-config:
+\
+config.kconfig_qconf.qt=5
+?sys:Qt5Moc
+?sys:libQt5Core
+?sys:libQt5Gui
+?sys:libQt5Widgets
+config.Qt5Moc=/usr/lib64/qt5/bin/moc
 config.cxx.coptions+=-fPIC
 \
