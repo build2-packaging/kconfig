@@ -4,11 +4,13 @@
  * Copyright (C) 2015 Boris Barbulovski <bbarbulovski@gmail.com>
  */
 
+#include <QtGlobal> // QT_VERSION
+
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QLabel>
 #include <QLayout>
@@ -17,6 +19,14 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QToolBar>
+
+#if QT_VERSION >= 0x060000
+#include <QScreen>
+#include <QRegularExpression>
+#else
+#include <QDesktopWidget>
+#include <QRegExp>
+#endif
 
 #include <stdlib.h>
 
@@ -1126,7 +1136,13 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
 
 QString ConfigInfoView::print_filter(const QString &str)
 {
-	QRegExp re("[<>&\"\\n]");
+#if QT_VERSION >= 0x060000
+	QRegularExpression
+#else
+	QRegExp
+#endif
+		re("[<>&\"\\n]");
+
 	QString res = str;
 	for (int i = 0; (i = res.indexOf(re, i)) >= 0;) {
 		switch (res[i].toLatin1()) {
@@ -1322,16 +1338,23 @@ ConfigMainWindow::ConfigMainWindow(void)
 	int width, height;
 	char title[256];
 
-	QDesktopWidget *d = configApp->desktop();
 	snprintf(title, sizeof(title), "%s%s",
 		rootmenu.prompt->text,
 		""
 		);
 	setWindowTitle(title);
 
+#if QT_VERSION >= 0x060000
+	QRect g = configApp->primaryScreen()->geometry();
+	width = configSettings->value("/window width", g.width() - 64).toInt();
+	height = configSettings->value("/window height", g.height() - 64).toInt();
+	resize(width, height);
+#else
+	QDesktopWidget *d = configApp->desktop();
 	width = configSettings->value("/window width", d->width() - 64).toInt();
 	height = configSettings->value("/window height", d->height() - 64).toInt();
 	resize(width, height);
+#endif
 	x = configSettings->value("/window x");
 	y = configSettings->value("/window y");
 	if ((x.isValid())&&(y.isValid()))
@@ -1379,17 +1402,17 @@ ConfigMainWindow::ConfigMainWindow(void)
 		this, &ConfigMainWindow::goBack);
 
 	QAction *quitAction = new QAction("&Quit", this);
-	quitAction->setShortcut(Qt::CTRL + Qt::Key_Q);
+	quitAction->setShortcut(Qt::CTRL | Qt::Key_Q);
 	connect(quitAction, &QAction::triggered,
 		this, &ConfigMainWindow::close);
 
 	QAction *loadAction = new QAction(QPixmap(xpm_load), "&Load", this);
-	loadAction->setShortcut(Qt::CTRL + Qt::Key_L);
+	loadAction->setShortcut(Qt::CTRL | Qt::Key_L);
 	connect(loadAction, &QAction::triggered,
 		this, &ConfigMainWindow::loadConfig);
 
 	saveAction = new QAction(QPixmap(xpm_save), "&Save", this);
-	saveAction->setShortcut(Qt::CTRL + Qt::Key_S);
+	saveAction->setShortcut(Qt::CTRL | Qt::Key_S);
 	connect(saveAction, &QAction::triggered,
 		this, &ConfigMainWindow::saveConfig);
 
@@ -1403,7 +1426,7 @@ ConfigMainWindow::ConfigMainWindow(void)
 	connect(saveAsAction, &QAction::triggered,
 		this, &ConfigMainWindow::saveConfigAs);
 	QAction *searchAction = new QAction("&Find", this);
-	searchAction->setShortcut(Qt::CTRL + Qt::Key_F);
+	searchAction->setShortcut(Qt::CTRL | Qt::Key_F);
 	connect(searchAction, &QAction::triggered,
 		this, &ConfigMainWindow::searchConfig);
 	singleViewAction = new QAction(QPixmap(xpm_single_view), "Single View", this);
@@ -1750,11 +1773,28 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
 		e->accept();
 		return;
 	}
+
+#if QT_VERSION >= 0x060000
+	QMessageBox mb(QMessageBox::Icon::Warning, "qconf",
+		       "Save configuration?");
+
+	QPushButton *yb = mb.addButton(QMessageBox::Yes);
+	QPushButton *db = mb.addButton(QMessageBox::No);
+	QPushButton *cb = mb.addButton(QMessageBox::Cancel);
+
+	yb->setText("&Save Changes");
+	db->setText("&Discard Changes");
+	cb->setText("Cancel Exit");
+
+	mb.setDefaultButton(yb);
+	mb.setEscapeButton(cb);
+#else
 	QMessageBox mb("qconf", "Save configuration?", QMessageBox::Warning,
 			QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
 	mb.setButtonText(QMessageBox::Yes, "&Save Changes");
 	mb.setButtonText(QMessageBox::No, "&Discard Changes");
 	mb.setButtonText(QMessageBox::Cancel, "Cancel Exit");
+#endif
 	switch (mb.exec()) {
 	case QMessageBox::Yes:
 		if (saveConfig())
