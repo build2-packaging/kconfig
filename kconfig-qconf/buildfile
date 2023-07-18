@@ -26,14 +26,23 @@ import libs += liblkc%lib{lkc}
 
 ./: exe{kconfig-qconf} doc{README.md} legal{LICENSE} manifest
 
-exe{kconfig-qconf}: {hxx cxx}{qconf} cxx{qconf-moc} {h c}{images} \
-  h{lkc expr} $libs testscript
-
 # The "metadata library": its purpose is to make sure all the imported
 # libraries are resolved for the ad hoc moc recipe below.
 #
 [rule_hint=cxx] libue{qconf-meta}: $libs
 
+exe{kconfig-qconf}: {hxx cxx}{qconf} cxx{qconf-moc} {h c}{images} \
+  h{lkc expr} libue{qconf-meta} testscript
+
+# @@ TMP install issue.
+#
+cxx{qconf-moc}: hxx{qconf} $moc
+{{
+  diag moc ($<[0]) -> $>
+  $moc -o $path($>) $path($<[0])
+}}
+
+#\
 cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
 {{
   l = ($<[1])
@@ -61,6 +70,40 @@ cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
   $moc $cc.poptions $cxx.poptions $lib_poptions $sys_poptions \
     -f $leaf($s) --output-dep-file --dep-file-path $t -o $o $s
 }}
+#\
+
+#\
+cxx{qconf-moc}: hxx{qconf}
+cxx{qconf-moc}: libue{qconf-meta}: update = unmatch # Note: not in $<
+cxx{qconf-moc}: $moc
+{{
+  o = $path($>)
+  t = $(o).t
+
+  # While it's unlikely any moc-relevant stuff will depend on any included
+  # headers, just in case let's do this properly and track all the header
+  # dependencies.
+  #
+  lib_poptions = $cxx.lib_poptions(libue{qconf-meta})
+  depdb hash $lib_poptions
+
+  # --update-exclude $l
+  #
+  depdb dyndep --byproduct --what=header --default-type=h \
+     --file $t
+
+  s = $path($<[0])
+  sys_poptions = $regex.apply($cxx.sys_hdr_dirs, '(.+)', '-I\1')
+
+  diag moc ($<[0]) -> $>
+
+  # Use -f to override the path moc uses to #include the input file, which is
+  # relative to the output directory, with just the name of the input file.
+  #
+  $moc $cc.poptions $cxx.poptions $lib_poptions $sys_poptions \
+    -f $leaf($s) --output-dep-file --dep-file-path $t -o $o $s
+}}
+#\
 
 # @@ Need to investigate why.
 #
