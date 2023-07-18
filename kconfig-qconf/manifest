@@ -23,11 +23,11 @@ depends: liblkc == $
 
 # CI builds.
 #
-builds: host : &latest
+builds: host : -static
 
 qt5-build-config: config.kconfig_qconf.qt=5
 
-sys-builds: sys : &latest
+sys-builds: sys : -static
 sys-build-include: linux_debian*-**
 sys-build-include: linux_ubuntu*-**
 sys-build-include: linux_fedora*-**
@@ -41,7 +41,7 @@ sys-build-config:
 config.Qt6Moc=/usr/lib/qt6/libexec/moc
 \
 
-qt5-sys-builds: sys : &latest
+qt5-sys-builds: sys : -static
 qt5-sys-build-include: linux_debian*-**
 qt5-sys-build-include: linux_ubuntu*-**
 qt5-sys-build-include: linux_fedora*-**
