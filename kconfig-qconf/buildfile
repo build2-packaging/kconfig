@@ -1,33 +1,65 @@
-# @@ This is temporary until we package Qt.
+# @@ TODO: optional metadata
 #
-if ($build.host.class != 'windows')
+#import! [metadata=optional] moc = Qt6Moc%exe{qt6moc}
+
+switch $config.kconfig_qconf.qt
 {
-  # This is how the Linux kernel does it. Of course, there is no guarantee
-  # that moc we find this way matches the libraries we import below. But it's
-  # definitely an improvement over just importing moc since in that case we
-  # are as likely to end up with the Qt4 version.
-  #
-  moc = exe{([dir_path] $process.run(pkg-config --variable=host_bins Qt5Core))/moc}
-}
-else
-{
-  import! moc = qt5%exe{moc}
+  case 5
+  {
+    import! moc = Qt5Moc%exe{qt5moc}
+
+    import libs  = libQt5Core%lib{Qt5Core}
+    import libs += libQt5Gui%lib{Qt5Gui}
+    import libs += libQt5Widgets%lib{Qt5Widgets}
+  }
+  case 6
+  {
+    import! moc = Qt6Moc%exe{qt6moc}
+
+    import libs  = libQt6Core%lib{Qt6Core}
+    import libs += libQt6Gui%lib{Qt6Gui}
+    import libs += libQt6Widgets%lib{Qt6Widgets}
+  }
 }
 
-import libs  = qt5%lib{Qt5Core}
-import libs += qt5%lib{Qt5Gui}
-import libs += qt5%lib{Qt5Widgets}
 import libs += liblkc%lib{lkc}
 
 ./: exe{kconfig-qconf} doc{README.md} legal{LICENSE} manifest
 
 exe{kconfig-qconf}: {hxx cxx}{qconf} cxx{qconf-moc} {h c}{images} \
-  h{lkc expr} $libs
+  h{lkc expr} $libs testscript
 
-cxx{qconf-moc}: hxx{qconf} $moc
+# The "metadata library": its purpose is to make sure all the imported
+# libraries are resolved for the ad hoc moc recipe below.
+#
+[rule_hint=cxx] libue{qconf-meta}: $libs
+
+cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
 {{
-  diag moc ($<[0])
-  $moc -o $path($>) $path($<[0])
+  l = ($<[1])
+  o = $path($>)
+  t = $(o).t
+
+  # While it's unlikely any moc-relevant stuff will depend on any included
+  # headers, just in case let's do this properly and track all the header
+  # dependencies.
+  #
+  lib_poptions = $cxx.lib_poptions($l)
+  depdb hash $lib_poptions
+
+  depdb dyndep --byproduct --what=header --default-type=h \
+    --update-exclude $l --file $t
+
+  s = $path($<[0])
+  sys_poptions = $regex.apply($cxx.sys_hdr_dirs, '(.+)', '-I\1')
+
+  diag moc ($<[0]) -> $>
+
+  # Use -f to override the path moc uses to #include the input file, which is
+  # relative to the output directory, with just the name of the input file.
+  #
+  $moc $cc.poptions $cxx.poptions $lib_poptions $sys_poptions \
+    -f $leaf($s) --output-dep-file --dep-file-path $t -o $o $s
 }}
 
 # @@ Need to investigate why.

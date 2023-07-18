@@ -1,3 +1,8 @@
+config [uint64] config.kconfig_qconf.qt ?= 6
+
+if ($config.kconfig_qconf.qt < 5 || $config.kconfig_qconf.qt > 6)
+  fail "config.kconfig_qconf.qt value must be between 5 and 6"
+
 cxx.std = latest
 
 using cxx

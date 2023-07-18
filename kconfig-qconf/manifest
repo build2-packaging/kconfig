@@ -9,9 +9,16 @@ description-file: README.md
 url: https://github.com/build2-packaging/kconfig/
 email: boris@codesynthesis.com
 build-error-email: builds@build2.org
-#builds: host
-builds: none ; Requires not yet packaged Qt5.
+
+builds: host : &latest
+
 depends: * build2 >= 0.16.0
 depends: * bpkg >= 0.16.0
+
+depends: * Qt5Moc                               ^5.15.0 ? ($config.kconfig_qconf.qt == 5)
+depends: { libQt5Core libQt5Gui libQt5Widgets } ^5.15.0 ? ($config.kconfig_qconf.qt == 5)
+
+depends: * Qt6Moc                               ^6.4.0  ? ($config.kconfig_qconf.qt == 6)
+depends: { libQt6Core libQt6Gui libQt6Widgets } ^6.4.0  ? ($config.kconfig_qconf.qt == 6)
+
 depends: liblkc == $
-requires: qt5

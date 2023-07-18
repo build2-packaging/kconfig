@@ -3,8 +3,18 @@ summary: kconfig project repository
 
 :
 role: prerequisite
-location: https://github.com/build2-packaging/byacc.git##HEAD
+location: https://pkg.cppget.org/1/testing
 
+# @@ TMP
+#
 :
 role: prerequisite
-location: https://github.com/build2-packaging/reflex.git##HEAD
+location: https://pkg.cppget.org/1/queue/testing
+
+#:
+#role: prerequisite
+#location: https://github.com/build2-packaging/byacc.git##HEAD
+
+#:
+#role: prerequisite
+#location: https://github.com/build2-packaging/reflex.git##HEAD
