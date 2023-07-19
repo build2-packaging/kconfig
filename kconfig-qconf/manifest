@@ -23,9 +23,13 @@ depends: liblkc == $
 
 # CI builds.
 #
-builds: host : &default -static
+# Note: we disable Qt5 builds by default not to waste resources. But they
+# can be enabled for individual CI requests.
+#
+builds: host : &default -static -( +macos &gcc )
 
-qt5-builds: host : &default -static
+qt5-builds: none
+#qt5-builds: host : &default -static -( +macos &gcc )
 qt5-build-config: config.kconfig_qconf.qt=5
 
 sys-debian-builds: sys : -static
@@ -42,7 +46,8 @@ sys-debian-build-config:
 config.Qt6Moc=/usr/lib/qt6/libexec/moc
 \
 
-qt5-sys-debian-builds: sys : -static
+qt5-sys-debian-builds: none
+#qt5-sys-debian-builds: sys : -static
 qt5-sys-debian-build-include: linux_debian*-**
 qt5-sys-debian-build-include: linux_ubuntu*-**
 qt5-sys-debian-build-exclude: **
@@ -69,7 +74,8 @@ sys-fedora-build-config:
 config.Qt6Moc=/usr/lib64/qt6/libexec/moc
 \
 
-qt5-sys-fedora-builds: sys : -static
+qt5-sys-fedora-builds: none
+#qt5-sys-fedora-builds: sys : -static
 qt5-sys-fedora-build-include: linux_fedora*-**
 qt5-sys-fedora-build-exclude: **
 qt5-sys-fedora-build-config:
