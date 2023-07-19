@@ -23,8 +23,9 @@ depends: liblkc == $
 
 # CI builds.
 #
-builds: host : -static
+builds: host : &default -static
 
+qt5-builds: host : &default -static
 qt5-build-config: config.kconfig_qconf.qt=5
 
 sys-debian-builds: sys : -static
