@@ -2,13 +2,15 @@
 #
 #import! [metadata=optional] moc = Qt6Moc%exe{qt6moc}
 
+import libs = liblkc%lib{lkc}
+
 switch $config.kconfig_qconf.qt
 {
   case 5
   {
     import! moc = Qt5Moc%exe{qt5moc}
 
-    import libs  = libQt5Core%lib{Qt5Core}
+    import libs += libQt5Core%lib{Qt5Core}
     import libs += libQt5Gui%lib{Qt5Gui}
     import libs += libQt5Widgets%lib{Qt5Widgets}
   }
@@ -16,13 +18,11 @@ switch $config.kconfig_qconf.qt
   {
     import! moc = Qt6Moc%exe{qt6moc}
 
-    import libs  = libQt6Core%lib{Qt6Core}
+    import libs += libQt6Core%lib{Qt6Core}
     import libs += libQt6Gui%lib{Qt6Gui}
     import libs += libQt6Widgets%lib{Qt6Widgets}
   }
 }
-
-import libs += liblkc%lib{lkc}
 
 ./: exe{kconfig-qconf} doc{README.md} legal{LICENSE} manifest
 
@@ -34,13 +34,15 @@ import libs += liblkc%lib{lkc}
 exe{kconfig-qconf}: {hxx cxx}{qconf} cxx{qconf-moc} {h c}{images} \
   h{lkc expr} libue{qconf-meta} testscript
 
-# @@ TMP install issue.
+# @@ TMP install issue, fixed in 0.17.0.
 #
+#\
 cxx{qconf-moc}: hxx{qconf} $moc
 {{
   diag moc ($<[0]) -> $>
   $moc -o $path($>) $path($<[0])
 }}
+#\
 
 #\
 cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
@@ -72,11 +74,11 @@ cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
 }}
 #\
 
-#\
 cxx{qconf-moc}: hxx{qconf}
-cxx{qconf-moc}: libue{qconf-meta}: update = unmatch # Note: not in $<
+cxx{qconf-moc}: libue{qconf-meta}: update = unmatch
 cxx{qconf-moc}: $moc
 {{
+  l = ($<[1])
   o = $path($>)
   t = $(o).t
 
@@ -84,11 +86,9 @@ cxx{qconf-moc}: $moc
   # headers, just in case let's do this properly and track all the header
   # dependencies.
   #
-  lib_poptions = $cxx.lib_poptions(libue{qconf-meta})
+  lib_poptions = $cxx.lib_poptions($l)
   depdb hash $lib_poptions
 
-  # --update-exclude $l
-  #
   depdb dyndep --byproduct --what=header --default-type=h \
      --file $t
 
@@ -103,7 +103,6 @@ cxx{qconf-moc}: $moc
   $moc $cc.poptions $cxx.poptions $lib_poptions $sys_poptions \
     -f $leaf($s) --output-dep-file --dep-file-path $t -o $o $s
 }}
-#\
 
 # @@ Need to investigate why.
 #
