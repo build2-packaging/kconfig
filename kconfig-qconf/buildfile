@@ -44,7 +44,6 @@ cxx{qconf-moc}: hxx{qconf} $moc
 }}
 #\
 
-#\
 cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
 {{
   l = ($<[1])
@@ -72,8 +71,8 @@ cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
   $moc $cc.poptions $cxx.poptions $lib_poptions $sys_poptions \
     -f $leaf($s) --output-dep-file --dep-file-path $t -o $o $s
 }}
-#\
 
+#\
 cxx{qconf-moc}: hxx{qconf}
 cxx{qconf-moc}: libue{qconf-meta}: update = unmatch
 cxx{qconf-moc}: $moc
@@ -103,6 +102,7 @@ cxx{qconf-moc}: $moc
   $moc $cc.poptions $cxx.poptions $lib_poptions $sys_poptions \
     -f $leaf($s) --output-dep-file --dep-file-path $t -o $o $s
 }}
+#\
 
 # @@ Need to investigate why.
 #
