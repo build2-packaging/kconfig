@@ -34,16 +34,33 @@ switch $config.kconfig_qconf.qt
 exe{kconfig-qconf}: {hxx cxx}{qconf} cxx{qconf-moc} {h c}{images} \
   h{lkc expr} libue{qconf-meta} testscript
 
-# @@ TMP install issue, fixed in 0.17.0.
+# For now use the simple moc recipe without any dynamic dependency extraction.
+# The reasons for this are:
 #
-#\
+# - Both of the below recipes require 0.17.0.
+#
+# - The moc compiler takes substantially longer if we supply all the header
+#   search paths.
+#
+# - Upstream doesn't bother, which means the moc-related declarations are
+#   unlikely to depend on anything we may include.
+#
+# - There is also the more conceptual issue: without predefs there is no
+#   guarantee that the include graph (and therefore macro definitions) that
+#   are seen by moc are the same as what is seen by the compiler. Plus, some
+#   compilers (e.g., GCC) have tricky partitioning of the header search paths
+#   for the <> vs "" inclusion (see `-I-` in GCC). Which makes one wonder if
+#   it is even feasible for moc to be consistent with the compiler (if you are
+#   still unsure, try throwing include_next into the mix, which, at least as
+#   of Qt 6.5, moc does not seem to recognize).
+#
 cxx{qconf-moc}: hxx{qconf} $moc
 {{
   diag moc ($<[0]) -> $>
   $moc -o $path($>) $path($<[0])
 }}
-#\
 
+#\
 cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
 {{
   l = ($<[1])
@@ -71,6 +88,7 @@ cxx{qconf-moc}: hxx{qconf} libue{qconf-meta} $moc
   $moc $cc.poptions $cxx.poptions $lib_poptions $sys_poptions \
     -f $leaf($s) --output-dep-file --dep-file-path $t -o $o $s
 }}
+#\
 
 #\
 cxx{qconf-moc}: hxx{qconf}
