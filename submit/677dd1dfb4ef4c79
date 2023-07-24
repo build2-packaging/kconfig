@@ -1,0 +1,7 @@
+: 1
+name: liblkc
+version: 0.3.0
+upstream-version: 5.15
+project: kconfig
+summary: Linux kernel configuration system C library
+license: GPL-2.0-only
